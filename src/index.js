@@ -2,14 +2,14 @@ import { Bot, InlineKeyboard } from "grammy";
 
 const bot = new Bot(process.env.BOT_TOKEN);
 
-bot.command("start", async (ctx) => await showMenu(ctx, true));
+bot.command("start", async (ctx) => await showMenu(ctx));
 
 bot.on("callback_query:data", async (ctx) => {
     const callbackData = ctx.callbackQuery.data;
 
     switch (callbackData) {
         case "menu":
-            await showMenu(ctx, false);
+            await showMenu(ctx, true);
             break;
         case "create_shop":
             await handleCreateShop(ctx);
@@ -18,7 +18,8 @@ bot.on("callback_query:data", async (ctx) => {
             break;
     }
 });
-async function showMenu(ctx, isNewMessage) {
+
+async function showMenu(ctx, isEditMessage) {
     const keyboard = new InlineKeyboard();
     keyboard
         .text("🏬 Создать магазин", "create_shop")
@@ -31,14 +32,14 @@ async function showMenu(ctx, isNewMessage) {
         "Выберите действие ниже 👇";
 
     
-    if(isNewMessage) {
-        await ctx.reply(message,
+    if(isEditMessage) {
+        await ctx.editMessageText(message,
             {
                 reply_markup: keyboard,
             }
         );
     } else {
-        await ctx.editMessageText(message,
+        await ctx.reply(message,
             {
                 reply_markup: keyboard,
             }
