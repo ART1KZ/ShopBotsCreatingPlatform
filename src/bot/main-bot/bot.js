@@ -36,6 +36,8 @@ bot.on("message", async (ctx) => {
         case "token_input":
             await handleTokenInput(ctx);
             break;
+        default:
+            break;
     }
 });
 
@@ -50,8 +52,7 @@ async function handleGetShops(ctx) {}
 async function showMenu(ctx, isEditMessage) {
     ctx.session.step = undefined;
     ctx.session.token = undefined;
-    const keyboard = new InlineKeyboard();
-    keyboard
+    const keyboard = new InlineKeyboard()
         .text("🏬 Создать магазин", "create_shop")
         .row()
         .text("🛍️ Мои магазины", "get_shops");
@@ -74,12 +75,11 @@ async function showMenu(ctx, isEditMessage) {
 
 // Запрос токена тг бота от пользователя
 async function handleCreateShop(ctx) {
-    const backButton = new InlineKeyboard();
-    backButton.text("❌ Назад", "menu");
-
     ctx.session.step = "token_input";
+
     await ctx.editMessageText("🔑 Отправьте токен вашего бота", {
-        reply_markup: backButton,
+        reply_markup: new InlineKeyboard()
+            .text("❌ Назад", "menu")
     });
 }
 
@@ -87,6 +87,30 @@ async function handleCreateShop(ctx) {
 async function handleTokenInput(ctx) {
     const userMessage = ctx.message.text.trim();
     const tokenRegex = /^\d{8,10}:[A-Za-z0-9_-]{35}$/;
-}
 
-// bot.start();
+    if (!tokenRegex.test(userMessage)) {
+        ctx.session.step = undefined;
+
+        await ctx.reply(
+            "😓 Токен имеет неверный формат.\n" +
+                "👇 Он должен выглядеть так\n" +
+                "<code>123456789:ABC-DEF1234ghIkl-zyx57W2v1u123ew11</code>\n" +
+                "Попробуйте снова! 🔑",
+            {
+                parse_mode: "HTML",
+                reply_markup: new InlineKeyboard()
+                    .text("🔑 Повторить ввод", "create_shop")
+                    .text("❌ Назад", "menu")
+            }
+        );
+        return;
+    }
+
+    await ctx.reply("✅ Бот успешно создан!", {
+        reply_markup: new InlineKeyboard()
+            .text("🏠 В главное меню", "menu")
+    })
+
+    
+    // TODO: реализовать создание и запуск экземпляра бота магазина
+}
