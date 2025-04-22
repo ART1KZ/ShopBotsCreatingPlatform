@@ -87,8 +87,6 @@ async function handleCreateShop(ctx) {
 async function handleTokenInput(ctx) {
     const userMessage = ctx.message.text.trim();
     const tokenRegex = /^\d{8,10}:[A-Za-z0-9_-]{35}$/;
-
-
 }
 
 // bot.start();
