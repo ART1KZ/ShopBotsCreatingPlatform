@@ -1,8 +1,23 @@
+import { Context, InlineKeyboard } from "grammy";
+import { supabase } from "../../../shared/utils/database/index.js";
+
+/**
+ * Запрашивает у пользователя токен своего бота для создания магазина
+ * @param {Context} ctx
+ */
+export async function createShopHandler(ctx) {
+    ctx.session.step = "token_input";
+
+    await ctx.editMessageText("🔑 Отправьте токен вашего бота", {
+        reply_markup: new InlineKeyboard().text("❌ Назад", "menu"),
+    });
+}
+
 /**
  * Обрабатывает введеный пользователем токен бота и создает новый магазин, если еще не существует
  * @param {Context} ctx
  */
-export async function tokenInputScene(ctx) {
+export async function tokenInputHandler(ctx) {
     ctx.session.step = undefined;
 
     const userMessage = ctx.message.text.trim();

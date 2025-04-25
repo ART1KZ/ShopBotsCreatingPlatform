@@ -1,8 +1,11 @@
+import { Context, InlineKeyboard } from "grammy";
+import { supabase } from "../../../shared/utils/database/index.js";
+
 /**
  * Отправляет меню взаимодействия со списком ботов-магазинов пользователя
  * @param {Context} ctx
  */
-export async function getShopsScene(ctx) {
+export async function getShopsHandler(ctx) {
     const shopsKeyboard = new InlineKeyboard();
 
     const messageSenderId = ctx.callbackQuery.from.id;

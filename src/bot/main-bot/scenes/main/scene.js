@@ -1,10 +1,12 @@
+import { Context, InlineKeyboard } from "grammy";
+
 /**
  * Отправляет меню главного бота пользователю
  * @param {Context} ctx
  * @param {boolean} isEditMessage
  * определяет, изменить последнее сообщение бота или отправить новое
  */
-export async function menuScene(ctx, isEditMessage = false) {
+export async function menuHandler(ctx, isEditMessage = false) {
     ctx.session.step = undefined;
     ctx.session.token = undefined;
     const keyboard = new InlineKeyboard()

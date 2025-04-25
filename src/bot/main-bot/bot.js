@@ -1,18 +1,18 @@
-import { Bot, InlineKeyboard, session, Context } from "grammy";
+import { Bot, session } from "grammy";
 import { decryptData, encryptData } from "../shared/utils/encryption.js";
-import { createClient } from "@supabase/supabase-js";
-import { createShopBot } from "../shop-bot/bot.js";
+import { menuHandler } from "./scenes/main/scene.js";
 import {
     sendDontUnderstandErrorMessage,
     sendUnexpectedErrorMessage,
 } from "../shared/utils/error.js";
+import { createShopHandler, tokenInputHandler } from "./scenes/adding-shop/scene.js";
+import { getShopsHandler } from "./scenes/editing-shops/scene.js";
 
-const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_KEY
-);
 
 export const bot = new Bot(process.env.BOT_TOKEN);
+
+// Запущенные боты магазины
+const activeShopBots = new Map();
 
 bot.use(
     session({
@@ -23,20 +23,20 @@ bot.use(
     })
 );
 
-bot.command("start", async (ctx) => await menuScene(ctx));
+bot.command("start", async (ctx) => await menuHandler(ctx));
 
 bot.on("callback_query:data", async (ctx) => {
     const callbackData = ctx.callbackQuery.data;
 
     switch (callbackData) {
         case "menu":
-            await menuScene(ctx, true);
+            await menuHandler(ctx, true);
             break;
         case "create_shop":
-            await createShopScene(ctx);
+            await createShopHandler(ctx);
             break;
         case "get_shops":
-            await getShopsScene(ctx);
+            await getShopsHandler(ctx);
             break;
     }
 
@@ -46,7 +46,7 @@ bot.on("callback_query:data", async (ctx) => {
 bot.on("message", async (ctx) => {
     switch (ctx.session.step) {
         case "token_input":
-            await tokenInputScene(ctx);
+            await tokenInputHandler(ctx);
             break;
         default:
             await sendDontUnderstandErrorMessage(ctx);
@@ -56,6 +56,5 @@ bot.on("message", async (ctx) => {
 
 bot.catch((error) => {
     console.log("Ошибка в боте", error);
-    // sendUnexpectedErrorMessage(ctx, false, error);
 });
 
