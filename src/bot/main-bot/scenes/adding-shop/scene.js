@@ -1,5 +1,9 @@
 import { Context, InlineKeyboard } from "grammy";
 import { supabase } from "../../../shared/utils/database/index.js";
+import { run } from "@grammyjs/runner";
+import { shopBotsMap } from "../../bot.js";
+import { encryptData } from "../../../shared/utils/encryption.js";
+import { createShopBot } from "../../../shop-bot/bot.js";
 
 /**
  * Запрашивает у пользователя токен своего бота для создания магазина
@@ -66,7 +70,8 @@ export async function tokenInputHandler(ctx) {
     }
 
     const shopBot = createShopBot(userMessage);
-    shopBot.start();
+    const shopBotProcess = run(shopBot);
+    shopBotsMap.set(botTokenHash, shopBotProcess);
 
     const shopBotUsername = (await shopBot.api.getMe()).username;
 

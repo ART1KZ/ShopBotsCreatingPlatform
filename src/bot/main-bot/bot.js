@@ -11,8 +11,8 @@ import { getShopsHandler } from "./scenes/editing-shops/scene.js";
 
 export const bot = new Bot(process.env.BOT_TOKEN);
 
-// Запущенные боты магазины
-const activeShopBots = new Map();
+// Текущие боты магазины
+export const shopBotsMap = new Map();
 
 bot.use(
     session({
@@ -57,4 +57,3 @@ bot.on("message", async (ctx) => {
 bot.catch((error) => {
     console.log("Ошибка в боте", error);
 });
-

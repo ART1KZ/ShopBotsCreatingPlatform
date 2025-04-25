@@ -25,7 +25,7 @@ export async function sendUnexpectedErrorMessage(
         return await ctx.reply(message, { reply_markup: menuKeyboard });
     else
         return await ctx.editMessageText(
-            "<b>⚠️ Непредвиденная ошибка. Попробуйте еще раз</b>",
+            message,
             { reply_markup: menuKeyboard }
         );
 }

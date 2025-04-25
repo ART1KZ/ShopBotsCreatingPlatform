@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@grammyjs/runner": "^2.0.3",
     "@supabase/supabase-js": "^2.49.4",
     "dotenv": "^16.5.0",
     "grammy": "^1.36.1"
