@@ -55,15 +55,14 @@ bot.on("message", async (ctx) => {
 });
 
 bot.catch((error) => {
-    console.log("Ошибка в боте", error);
-    // sendUnexpectedErrorMessage(ctx, false, error);
+    console.log("Ошибка в боте:", error);
 });
 
 /**
  * Отправляет меню взаимодействия со списком ботов-магазинов пользователя
  * @param {Context} ctx
  */
-async function getShopsScene(ctx) {
+export async function getShopsScene(ctx) {
     const shopsKeyboard = new InlineKeyboard();
 
     const messageSenderId = ctx.callbackQuery.from.id;
@@ -74,36 +73,35 @@ async function getShopsScene(ctx) {
         .select("*")
         .eq("owner_tg_id", messageSenderId);
 
-    for (let shop of ownerShops.data) {
+    for (const shop of ownerShops.data) {
         shopsKeyboard.text(`👑 ${shop.name}`, `menu`).row();
     }
 
-    const adminShops = [];
-    // TODO: реализовать поиск магазинов, где пользователь является администратором
-
     // Все записи со связью текущего пользователя с магазинами, где он администратор
-    // const adminRelations = await supabase
-    //     .from("administrators")
-    //     .select("*")
-    //     .eq("tg_user_id", messageSenderId);
+    const adminRelations = await supabase
+        .from("administrators")
+        .select("*")
+        .eq("tg_user_id", messageSenderId);
 
-    // for(let botTokenHash of adminRelations.data.bot_token_hash) {
-    //     // Получаем информацию о магазине по хэшу токена
-    //     const shopInfo = await supabase
-    //         .from("shops")
-    //         .select("*")
-    //         .eq("bot_token_hash", botTokenHash);
-        
-    //     adminShops.push(shopInfo.data);
-    // }
+    const adminShopTokenHashes = [];
 
-    // for (let shop of adminShops) {
-    //     shopsKeyboard.text(`🛡️ ${shop.name}`, `menu`).row();
-    // }
+    for (const relation of adminRelations.data) {
+        // Получаем информацию о магазине по хэшу токена
+        adminShopTokenHashes.push(relation.bot_token_hash);
+    }
+
+    const adminShops = await supabase
+        .from("shops")
+        .select("*")
+        .in("bot_token_hash", adminShopTokenHashes);
+
+    for (const shop of adminShops.data) {
+        shopsKeyboard.text(`🛡️ ${shop.name}`, `menu`).row();
+    }
 
     shopsKeyboard.text("❌ Назад", "menu");
 
-    await ctx.editMessageText("🛒 Ваш список магазинов:", {
+    await ctx.editMessageText("🛒 Список ваших магазинов:", {
         reply_markup: shopsKeyboard,
     });
 }
@@ -123,17 +121,19 @@ async function menuScene(ctx, isEditMessage = false) {
         .text("🛍️ Мои магазины", "get_shops");
 
     const message =
-        "👋 Добро пожаловать!\n" +
+        "<b>👋 Добро пожаловать!</b>\n\n" +
         "🚀 Создавайте и управляйте своими магазинами в Telegram легко и быстро!\n" +
         "Выберите действие ниже 👇";
 
     if (isEditMessage) {
         await ctx.editMessageText(message, {
             reply_markup: keyboard,
+            parse_mode: "HTML",
         });
     } else {
         await ctx.reply(message, {
             reply_markup: keyboard,
+            parse_mode: "HTML",
         });
     }
 }
