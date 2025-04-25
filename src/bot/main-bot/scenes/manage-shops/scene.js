@@ -1,6 +1,9 @@
 import { Bot, Context, InlineKeyboard } from "grammy";
 import { supabase } from "../../../shared/utils/database/index.js";
 import { decryptData } from "../../../shared/utils/encryption.js";
+import { activeShopBotsHandlers } from "../../bot.js";
+import { sendUnexpectedErrorMessage } from "../../../shared/utils/error.js";
+import { run } from "@grammyjs/runner";
 
 /**
  * Отправляет меню взаимодействия со списком ботов-магазинов пользователя
@@ -22,7 +25,7 @@ export async function getShopsHandler(ctx) {
         for (const tokenHash of ownerShopsHashes) {
             const botToken = decryptData(tokenHash.bot_token_hash);
             const shopName = (await new Bot(botToken).api.getMe()).first_name;
-            shopsKeyboard.text(`👑 ${shopName}`, `menu`).row();
+            shopsKeyboard.text(`👑 ${shopName}`, `manage_shop`).row();
         }
     
         // Все записи со связью текущего пользователя с магазинами, где он администратор
@@ -37,7 +40,7 @@ export async function getShopsHandler(ctx) {
             const botToken = decryptData(tokenHash.bot_token_hash);
             console.log(botToken)
             const shopName = (await new Bot(botToken).api.getMe()).first_name;
-            shopsKeyboard.text(`🛡️ ${shopName}`, `menu`).row();
+            shopsKeyboard.text(`🛡️ ${shopName}`, `manage_shop`).row();
         }
     
         shopsKeyboard.text("❌ Назад", "menu");
@@ -46,6 +49,19 @@ export async function getShopsHandler(ctx) {
             reply_markup: shopsKeyboard,
         });
     } catch(err) {
+
         console.error(err);
     }
+}
+
+/**
+ * Отправляет меню взаимодействия с выбранным пользователем ботом (хеш токена которого указан в сессии)
+ * @param {Context} ctx
+ */
+export async function manageShopHandler(ctx) {
+    const botToken = decryptData(ctx.session.currentBotTokenHash);
+    const shop = activeShopBotsHandlers.get(ctx.session.currentBotTokenHash);
+    const settingsKeyboard = new InlineKeyboard()
+    const shop1 = run(botToken)
+    shop1.isRunning
 }

@@ -6,19 +6,19 @@ import {
     sendUnexpectedErrorMessage,
 } from "../shared/utils/error.js";
 import { createShopHandler, tokenInputHandler } from "./scenes/adding-shop/scene.js";
-import { getShopsHandler } from "./scenes/editing-shops/scene.js";
+import { getShopsHandler } from "./scenes/manage-shops/scene.js";
 
 
 export const bot = new Bot(process.env.BOT_TOKEN);
 
 // Текущие боты магазины
-export const shopBotsMap = new Map();
+export const activeShopBotsHandlers = new Map();
 
 bot.use(
     session({
         initial: () => ({
             step: undefined, // Текущий этап пользователя в боте
-            token: undefined, // Последний введенный токен бота пользователем
+            currentBotTokenHash: undefined, // Последний введенный токен бота пользователем
         }),
     })
 );
@@ -38,6 +38,9 @@ bot.on("callback_query:data", async (ctx) => {
         case "get_shops":
             await getShopsHandler(ctx);
             break;
+        case "manage_shop":
+            await manageShopHandler(ctx);
+            break;
     }
 
     await ctx.answerCallbackQuery();
@@ -55,5 +58,5 @@ bot.on("message", async (ctx) => {
 });
 
 bot.catch((error) => {
-    console.log("Ошибка в боте", error);
+    console.log("Ошибка в боте", JSON.stringify(error));
 });
