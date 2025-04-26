@@ -14,7 +14,7 @@ export async function mainScene(ctx) {
         reply_markup: new InlineKeyboard()
         .text('🛍️ Каталог', 'get_products')
         .text('🛒 Корзина', 'get_products')
-        .text(' Заказы', 'get_products')
+        .text(' Заказы', 'orders')
     });
 }
 

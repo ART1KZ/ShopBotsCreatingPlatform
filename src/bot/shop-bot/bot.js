@@ -1,5 +1,6 @@
 import { Bot } from "grammy";
 import { getCategories, getCart, mainScene } from "./scenes/main/scene.js";
+import { ordersScene } from "./scenes/orders/scene.js";
 
 /**
  * Возвращаяет экземпляр бота-магазина
@@ -8,7 +9,7 @@ import { getCategories, getCart, mainScene } from "./scenes/main/scene.js";
  */
 export function createShopBot(token) {
     const bot = new Bot(token);
-    console.log(ctx)
+
     bot.command("start", async (ctx) => await mainScene(ctx));
 
     bot.on("callback_query:data", async (ctx) => {
@@ -21,8 +22,11 @@ export function createShopBot(token) {
             case "get_cart":
                 await getCart(ctx);
                 break;
+            case "orders":
+                await ordersScene(ctx);
+                break;
         }
     });
-    
+
     return bot;
 }
