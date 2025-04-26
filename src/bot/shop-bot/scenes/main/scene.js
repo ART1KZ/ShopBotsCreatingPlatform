@@ -1,38 +1,35 @@
 import { Context, InlineKeyboard } from 'grammy';
 import {supabase} from '../../../shared/utils/database/index.js';
-
+import { encryptData } from '../../../shared/utils/encryption.js';
 /**
  * Ответ на команду /start
  * @param {Context} ctx 
  */
 export async function mainScene(ctx) {
-    const message = `
-        Привет это магазин товаров для очень взрослых)))
-    `
+    try {
+        ctx.session.currentBotTokenHash = encryptData(ctx.api.token);
 
-    await ctx.reply(message, {
-        reply_markup: new InlineKeyboard()
-        .text('🛍️ Каталог', 'get_products')
-        .text('🛒 Корзина', 'get_products')
-        .text(' Заказы', 'get_products')
-    });
-}
-
-/**
- * 
- * @param {Context} ctx
- */
-export async function  getCategories(params) {
-    const categories = await supabase
-    .from('categories')
-    .select()
-    // .eq('shop_id', )
-}
-
-/**
- * 
- * @param {Context} ctx
- */
-export async function getCart(params) {
-    
+        const message = `
+            Добро пожаловать в магазин!
+        `
+        console.log(ctx)
+        if (ctx.update.callback_query) {
+            await ctx.editMessageText(message, {
+                reply_markup: new InlineKeyboard()
+                .text('🛍️ Каталог', 'get_categories')
+                .text('🛒 Корзина', 'get_cart')
+                .text(' Заказы', 'get_orders')
+            })
+        } else {
+            await ctx.reply(message, {
+                reply_markup: new InlineKeyboard()
+                .text('🛍️ Каталог', 'get_categories')
+                .text('🛒 Корзина', 'get_cart')
+                .text(' Заказы', 'get_orders')
+            });
+        }
+    }
+    catch (error) {
+        console.error(error);
+    }
 }
