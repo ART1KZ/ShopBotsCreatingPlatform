@@ -88,20 +88,23 @@ export async function manageShopHandler(ctx) {
 
     const telegramShopData = await new Bot(botToken).api.getMe();
 
-    settingsKeyboard.text(
-        isActive ? "🛑 Выключить бота" : "🟢 Включить бота",
-        isActive ? `toggle_bot_${shopId}_off` : `toggle_bot_${shopId}_on`
-    ).row();
+    settingsKeyboard
+        .text(
+            isActive ? "🛑 Выключить бота" : "🟢 Включить бота",
+            isActive ? `toggle_bot_${shopId}_off` : `toggle_bot_${shopId}_on`
+        )
+        .text(`🗂️ Управление сущностями`, `get_categories_${shopId}`)
+        .row();
 
     settingsKeyboard.text("❌ Назад", "get_shops");
     await ctx.editMessageText(
         `<b>🏬 Имя магазина:</b> ${telegramShopData.first_name}\n` +
             `<b>🔗 Ссылка:</b> t.me/${telegramShopData.username}\n` +
-            `<b>📊 Статус:</b> ${shopStatus}\n`,
+            `<b>📊 Статус:</b> ${shopStatus}\n` +
+            `<b>🔑 Токен:</b> <tg-spoiler>${botToken}</tg-spoiler>`,
         {
             reply_markup: settingsKeyboard,
             parse_mode: "HTML",
         }
     );
 }
-
