@@ -73,6 +73,7 @@ export async function getShopsHandler(ctx) {
  */
 export async function manageShopHandler(ctx) {
     const shopId = ctx.callbackQuery.data.split("_")[2];
+
     const settingsKeyboard = new InlineKeyboard();
 
     let { data: shopBotData } = await supabase
@@ -80,18 +81,27 @@ export async function manageShopHandler(ctx) {
         .select("*")
         .eq("id", shopId)
         .single();
-        
+
     const botToken = decryptData(shopBotData.bot_token_hash);
-    const shopStatus = isShopBotRunning(botToken) ? "включен" : "выключен";
+    const isActive = isShopBotRunning(botToken);
+    const shopStatus = isActive ? "Включен ✅" : "Выключен ❌";
+
     const telegramShopData = await new Bot(botToken).api.getMe();
+
+    settingsKeyboard.text(
+        isActive ? "🛑 Выключить бота" : "🟢 Включить бота",
+        isActive ? `toggle_bot_${shopId}_off` : `toggle_bot_${shopId}_on`
+    ).row();
+
     settingsKeyboard.text("❌ Назад", "get_shops");
     await ctx.editMessageText(
-        `<b>Имя магазина:</b> ${telegramShopData.first_name}\n` +
-            `<b>Ссылка:</b> t.me/${telegramShopData.username}\n` +
-            `<b>Статус:</b> ${shopStatus}\n`,
+        `<b>🏬 Имя магазина:</b> ${telegramShopData.first_name}\n` +
+            `<b>🔗 Ссылка:</b> t.me/${telegramShopData.username}\n` +
+            `<b>📊 Статус:</b> ${shopStatus}\n`,
         {
             reply_markup: settingsKeyboard,
             parse_mode: "HTML",
         }
     );
 }
+
