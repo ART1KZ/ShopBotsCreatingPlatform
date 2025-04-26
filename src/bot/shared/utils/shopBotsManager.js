@@ -22,7 +22,7 @@ export async function startShopBot(token) {
 
         activeShopBotsHandlers.set(token, shopBotHandler);
     } catch (error) {
-        console.error("Не удалось запустить бот-магазин", JSON.stringify(error));
+        console.error("Не удалось запустить бот-магазин", error);
     }
 }
 
