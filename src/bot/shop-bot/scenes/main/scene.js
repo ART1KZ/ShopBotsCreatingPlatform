@@ -10,21 +10,6 @@ export async function mainScene(ctx) {
     `
 
     await ctx.reply(message, {
-        reply_markup: {
-            inline_keyboard: [
-                [
-                    {
-                        text: 'Товары',
-                        callback_data: 'products'
-                    }
-                ],
-                [
-                    {
-                        text: 'Корзина',
-                        callback_data: 'cart'
-                    }
-                ]
-            ]
-        }
+        reply_markup: new InlineKeyboard().text('🛍️ Мои товары', 'get_products')
     });
 }
