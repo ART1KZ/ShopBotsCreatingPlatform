@@ -31,7 +31,3 @@ export async function menuHandler(ctx, isEditMessage = false) {
         });
     }
 }
-
-/**
- * 
- */
