@@ -224,7 +224,7 @@ export async function search(ctx) {
         .select("*")
         .eq("id", answer.id);
 
-        await ctx.reply(product.data[0].name, {
+        await ctx.reply(`${product.data[0].name} - ${product.data[0].price}`, {
             reply_markup: {
                 inline_keyboard: [
                     [{
