@@ -9,5 +9,7 @@ export async function mainScene(ctx) {
         Привет это магазин товаров для очень взрослых)))
     `
 
-    await ctx.reply(message);
+    await ctx.reply(message, {
+        reply_markup: new InlineKeyboard().text('🛍️ Мои товары', 'get_products')
+    });
 }
