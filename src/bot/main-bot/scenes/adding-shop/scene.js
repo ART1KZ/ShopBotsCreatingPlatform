@@ -12,7 +12,7 @@ import { sendUnexpectedErrorMessage } from "../../../shared/utils/error.js";
  */
 export async function createShopHandler(ctx) {
     ctx.session.step = "token_input";
-    
+
     await ctx.editMessageText("🔑 Отправьте токен вашего бота", {
         reply_markup: new InlineKeyboard().text("❌ Назад", "menu"),
     });
@@ -25,71 +25,66 @@ export async function createShopHandler(ctx) {
 export async function tokenInputHandler(ctx) {
     ctx.session.step = undefined;
 
-    try {
-        const userMessage = ctx.message.text.trim();
-        const tokenRegex = /^\d{8,10}:[A-Za-z0-9_-]{35}$/;
+    const userMessage = ctx.message.text.trim();
+    const tokenRegex = /^\d{8,10}:[A-Za-z0-9_-]{35}$/;
 
-        if (!tokenRegex.test(userMessage)) {
-            ctx.session.step = undefined;
+    if (!tokenRegex.test(userMessage)) {
+        ctx.session.step = undefined;
 
+        await ctx.reply(
+            "😓 Неверный формат токена бота\n" +
+                "👇 Он должен выглядеть примерно так:\n" +
+                "<code>123456789:ABC-DEF1234ghIkl-zyx57W2v1u123ew11</code>",
+            {
+                parse_mode: "HTML",
+                reply_markup: new InlineKeyboard()
+                    .text("🔄 Повторить ввод", "create_shop")
+                    .text("❌ Назад", "menu"),
+            }
+        );
+        return;
+    }
+
+    const botTokenHash = encryptData(userMessage);
+    const shopOwnerId = ctx.message.from.id;
+
+    const { data: newShop, error } = await supabase
+        .from("shops")
+        .insert([{ bot_token_hash: botTokenHash, owner_tg_id: shopOwnerId }])
+        .single();
+
+    if (error) {
+        // Ошибка уникальности (дублирующийся bot_token_hash)
+        if (error.code === "23505") {
             await ctx.reply(
-                "😓 Неверный формат токена бота\n" +
-                    "👇 Он должен выглядеть примерно так:\n" +
-                    "<code>123456789:ABC-DEF1234ghIkl-zyx57W2v1u123ew11</code>",
+                "😓 Этот токен уже используется\n" +
+                    "Используйте новый токен или удалите существующий магазин",
                 {
-                    parse_mode: "HTML",
                     reply_markup: new InlineKeyboard()
-                        .text("🔄 Повторить ввод", "create_shop")
+                        .text("🔑 Повторить ввод", "create_shop")
                         .text("❌ Назад", "menu"),
                 }
             );
-            return;
+        } else {
+            await sendUnexpectedErrorMessage(ctx, false, error);
         }
-
-        const botTokenHash = encryptData(userMessage);
-        const shopOwnerId = ctx.message.from.id;
-
-        const { error } = await supabase
-            .from("shops")
-            .insert([
-                { bot_token_hash: botTokenHash, owner_tg_id: shopOwnerId },
-            ]);
-
-        if (error) {
-            // Ошибка уникальности (дублирующийся bot_token_hash)
-            if (error.code === "23505") {
-                await ctx.reply(
-                    "😓 Этот токен уже используется\n" +
-                        "Используйте новый токен или удалите существующий магазин",
-                    {
-                        reply_markup: new InlineKeyboard()
-                            .text("🔑 Повторить ввод", "create_shop")
-                            .text("❌ Назад", "menu"),
-                    }
-                );
-            } else {
-                await sendUnexpectedErrorMessage(ctx, false, error);
-            }
-            return;
-        }
-
-        const shopBot = createShopBot(userMessage);
-        const shopBotHandler = run(shopBot);
-        activeShopBotsHandlers.set(userMessage, shopBotHandler);
-
-        const shopBotUsername = (await shopBot.api.getMe()).username;
-
-        await ctx.reply(
-            "✅ Бот успешно создан!\n" +
-                `🔗 Ссылка на бота: t.me/${shopBotUsername}`,
-            {
-                reply_markup: new InlineKeyboard().text(
-                    "🏠 В главное меню",
-                    "menu"
-                ),
-            }
-        );
-    } catch (error) {
-        await sendUnexpectedErrorMessage(ctx, false, error);
+        return;
     }
+
+    const shopBot = createShopBot(userMessage);
+    const shopBotHandler = run(shopBot);
+    activeShopBotsHandlers.set(userMessage, shopBotHandler);
+
+    const shopBotUsername = (await shopBot.api.getMe()).username;
+
+    await ctx.reply(
+        "✅ Бот успешно создан!\n" +
+            `🔗 Ссылка на бота: t.me/${shopBotUsername}`,
+        {
+            reply_markup: new InlineKeyboard()
+                .text("⚙️ Настройка магазина", `manage_shop_${newShop.id}`)
+                .row()
+                .text("🏠 В главное меню", "menu"),
+        }
+    );
 }

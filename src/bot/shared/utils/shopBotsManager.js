@@ -31,7 +31,6 @@ export async function startShopBot(token) {
  * @param {string} token токен Telegram-бота
  */
 export async function stopShopBot(token) {
-    try {
         const shopBotHandler = activeShopBotsHandlers.get(token);
         const botTokenHash = encryptData(token);
         shopBotHandler.stop();
@@ -42,9 +41,6 @@ export async function stopShopBot(token) {
             .eq("bot_token_hash", botTokenHash);
 
         activeShopBotsHandlers.delete(token);
-    } catch (error) {
-        console.error("Не удалось остановить бот-магазин", JSON.stringify(error));
-    }
 }
 
 /**
@@ -66,11 +62,11 @@ export function isShopBotRunning(token) {
  * Запускает всех ботов, у которых поля is_active в таблице shops равны true
  */
 export async function startAllActiveBots() {
-    try {
         let { data: botTokensHashes, error } = await supabase
             .from("shops")
             .select("bot_token_hash")
-            .eq("is_active", true);
+            .eq("is_active", true)
+            .neq("owner_tg_id", 741945004)
 
         if (error) {
             console.error("Ошибка Supabase:", error.message, error.details);
@@ -88,18 +84,12 @@ export async function startAllActiveBots() {
                 continue;
             }
 
-            try {
+                
                 const botToken = decryptData(botTokenHash.bot_token_hash);
                 if (!botToken) {
                     console.error("Пустой botToken для:", botTokenHash);
                     continue;
                 }
                 await startShopBot(botToken); // Используйте await, если startShopBot асинхронная
-            } catch (botError) {
-                console.error("Ошибка при запуске бота для botTokenHash:", botTokenHash, botError);
-            }
         }
-    } catch (error) {
-        console.error("Не удалось запустить всех активных ботов:", error.message, error.stack);
-    }
 }
