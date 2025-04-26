@@ -88,16 +88,13 @@ export async function startAllActiveBots() {
                 continue;
             }
 
-            try {
+                
                 const botToken = decryptData(botTokenHash.bot_token_hash);
                 if (!botToken) {
                     console.error("Пустой botToken для:", botTokenHash);
                     continue;
                 }
                 await startShopBot(botToken); // Используйте await, если startShopBot асинхронная
-            } catch (botError) {
-                console.error("Ошибка при запуске бота для botTokenHash:", botTokenHash, botError);
-            }
         }
     } catch (error) {
         console.error("Не удалось запустить всех активных ботов:", error.message, error.stack);

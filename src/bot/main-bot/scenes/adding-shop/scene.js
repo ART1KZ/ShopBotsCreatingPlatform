@@ -25,7 +25,7 @@ export async function createShopHandler(ctx) {
 export async function tokenInputHandler(ctx) {
     ctx.session.step = undefined;
 
-    try {
+
         const userMessage = ctx.message.text.trim();
         const tokenRegex = /^\d{8,10}:[A-Za-z0-9_-]{35}$/;
 
@@ -89,7 +89,4 @@ export async function tokenInputHandler(ctx) {
                 ),
             }
         );
-    } catch (error) {
-        await sendUnexpectedErrorMessage(ctx, false, error);
-    }
 }
