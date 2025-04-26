@@ -1,7 +1,7 @@
-import { Context } from 'grammy';
+import { Context, InlineKeyboard } from 'grammy';
 
 /**
- * 
+ * Ответ на команду /start
  * @param {Context} ctx 
  */
 export async function mainScene(ctx) {
@@ -12,4 +12,20 @@ export async function mainScene(ctx) {
     await ctx.reply(message, {
         reply_markup: new InlineKeyboard().text('🛍️ Мои товары', 'get_products')
     });
+}
+
+/**
+ * 
+ * @param {Context} ctx
+ */
+export async function  getCategories(params) {
+    
+}
+
+/**
+ * 
+ * @param {Context} ctx
+ */
+export async function getCart(params) {
+    
 }
