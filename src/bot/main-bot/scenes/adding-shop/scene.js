@@ -52,7 +52,7 @@ export async function tokenInputHandler(ctx) {
         const { error } = await supabase
             .from("shops")
             .insert([
-                { bot_token_hash: botTokenHash, owner_id: shopOwnerId },
+                { bot_token_hash: botTokenHash, owner_tg_id: shopOwnerId },
             ]);
 
         if (error) {
@@ -68,14 +68,14 @@ export async function tokenInputHandler(ctx) {
                     }
                 );
             } else {
-                await sendUnexpectedErrorMessage(ctx, error);
+                await sendUnexpectedErrorMessage(ctx, false, error);
             }
             return;
         }
 
         const shopBot = createShopBot(userMessage);
-        const shopBotProcess = run(shopBot);
-        activeShopBotsHandlers.set(botTokenHash, shopBotProcess);
+        const shopBotHandler = run(shopBot);
+        activeShopBotsHandlers.set(userMessage, shopBotHandler);
 
         const shopBotUsername = (await shopBot.api.getMe()).username;
 
