@@ -1,6 +1,6 @@
 import { Bot, session } from "grammy";
 import { mainScene } from "./scenes/main/scene.js";
-import { getCategories, getCategory, getProduct } from "./scenes/catalog/scene.js";
+import { getCategories, getCategory, getProduct, search } from "./scenes/catalog/scene.js";
 
 /**
  * Возвращаяет экземпляр бота-магазина
@@ -41,9 +41,18 @@ export function createShopBot(token) {
             case /main_menu/.test(callbackData):
                 await mainScene(ctx);
                 break;
+            case /search/.test(callbackData):
+                await search(ctx);
+                break;
             // case "get_cart":
             //     await getCart(ctx);
             //     break;
+        }
+    });
+
+    bot.on("message:text", async (ctx) => {
+        if (ctx.session.step === "search_input") {
+            await search(ctx);
         }
     });
     
