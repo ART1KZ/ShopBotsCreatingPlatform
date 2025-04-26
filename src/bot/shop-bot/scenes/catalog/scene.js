@@ -129,8 +129,8 @@ export async function getProduct(ctx) {
             reply_markup: {
                 inline_keyboard: [
                     [{
-                        text: "🛒 Добавить в корзину",
-                        callback_data: `add_to_cart ${product_id}`,
+                        text: "🛒 Купить",
+                        callback_data: `buy ${product_id}`,
                     }],
                     [{
                         text: "❌ Назад",
@@ -228,8 +228,8 @@ export async function search(ctx) {
             reply_markup: {
                 inline_keyboard: [
                     [{
-                        text: "🛒 Добавить в корзину",
-                        callback_data: `add_to_cart ${product.data[0].id}`,
+                        text: "🛒 Купить",
+                        callback_data: `buy ${product.data[0].id}`,
                     }],
                     [{
                         text: "❌ Назад",
