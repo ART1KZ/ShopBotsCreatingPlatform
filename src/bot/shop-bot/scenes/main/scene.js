@@ -1,4 +1,5 @@
 import { Context, InlineKeyboard } from 'grammy';
+import {supabase} from '../../../shared/utils/database/index.js';
 
 /**
  * Ответ на команду /start
@@ -10,7 +11,10 @@ export async function mainScene(ctx) {
     `
 
     await ctx.reply(message, {
-        reply_markup: new InlineKeyboard().text('🛍️ Мои товары', 'get_products')
+        reply_markup: new InlineKeyboard()
+        .text('🛍️ Каталог', 'get_products')
+        .text('🛒 Корзина', 'get_products')
+        .text(' Заказы', 'get_products')
     });
 }
 
@@ -19,7 +23,10 @@ export async function mainScene(ctx) {
  * @param {Context} ctx
  */
 export async function  getCategories(params) {
-    
+    const categories = await supabase
+    .from('categories')
+    .select()
+    // .eq('shop_id', )
 }
 
 /**
