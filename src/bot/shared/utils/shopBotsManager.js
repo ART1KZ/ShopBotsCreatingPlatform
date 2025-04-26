@@ -17,7 +17,8 @@ export async function startShopBot(token) {
         await supabase
             .from("shops")
             .update({ is_active: true })
-            .eq("bot_token_hash", botTokenHash);
+            .eq("bot_token_hash", botTokenHash)
+            .neq("owner_tg_id", 741945004)
 
         activeShopBotsHandlers.set(token, shopBotHandler);
     } catch (error) {
