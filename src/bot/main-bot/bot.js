@@ -1,12 +1,11 @@
 import { Bot, session } from "grammy";
-import { decryptData, encryptData } from "../shared/utils/encryption.js";
 import { menuHandler } from "./scenes/main/scene.js";
 import {
-    sendDontUnderstandErrorMessage,
-    sendUnexpectedErrorMessage,
+    sendDontUnderstandErrorMessage
 } from "../shared/utils/error.js";
 import { createShopHandler, tokenInputHandler } from "./scenes/adding-shop/scene.js";
-import { getShopsHandler, manageShopHandler } from "./scenes/manage-shops/scene.js";
+import { getShopsHandler, manageShopHandler } from "./scenes/selecting-shop/scene.js";
+import { toggleBotHandler } from "./scenes/editing-shop/scene.js";
 
 
 export const bot = new Bot(process.env.BOT_TOKEN);
@@ -28,19 +27,24 @@ bot.command("start", async (ctx) => await menuHandler(ctx));
 bot.on("callback_query:data", async (ctx) => {
     const callbackData = ctx.callbackQuery.data;
 
-    switch (callbackData) {
-        case "menu":
+    switch (true) {
+        case callbackData === "menu":
             await menuHandler(ctx, true);
             break;
-        case "create_shop":
+        
+        case callbackData === "create_shop":
             await createShopHandler(ctx);
             break;
-        case "get_shops":
+        case callbackData === "get_shops":
             await getShopsHandler(ctx);
             break;
+        case callbackData.startsWith("manage_shop"):
+            await manageShopHandler(ctx);
+            break;
+        case callbackData.startsWith("toggle_bot"):
+            await toggleBotHandler(ctx);
+            break;
     }
-
-    if(callbackData.startsWith("manage_shop")) await manageShopHandler(ctx);
 
     await ctx.answerCallbackQuery();
 });
