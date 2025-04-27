@@ -97,5 +97,5 @@ bot.on("message", async (ctx) => {
 });
 
 bot.catch((error) => {
-    console.log("Ошибка в боте", error);
+    console.error("Ошибка в боте", error);
 });

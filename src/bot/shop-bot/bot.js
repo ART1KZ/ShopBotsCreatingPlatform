@@ -1,7 +1,13 @@
 import { Bot, session } from "grammy";
 import { ordersScene } from "./scenes/orders/scene.js";
 import { mainScene } from "./scenes/main/scene.js";
-import { getCategories, getCategory, getProduct, search } from "./scenes/catalog/scene.js";
+import {
+    getCategories,
+    getCategory,
+    getProduct,
+    search,
+} from "./scenes/catalog/scene.js";
+import { buyProductStep } from "./scenes/catalog/steps/buyProduct.js";
 
 /**
  * Возвращаяет экземпляр бота-магазина
@@ -19,6 +25,9 @@ export function createShopBot(token) {
                     currentPage: 0,
                     maxPage: 0,
                 },
+                catalog: {
+                    currentProductId: -1,
+                },
                 currentBotTokenHash: undefined, // Последний введенный токен бота пользователем
             }),
         }),
@@ -29,16 +38,14 @@ export function createShopBot(token) {
     bot.on("callback_query:data", async (ctx) => {
         const callbackData = ctx.callbackQuery.data;
 
-
         switch (true) {
             case /get_categories/.test(callbackData):
                 await getCategories(ctx);
                 break;
             case /get_category [0-9]+/.test(callbackData):
-                console.log('checked')
                 await getCategory(ctx);
                 break;
-            case /orders/.test(callbackData):
+            case /orders$/.test(callbackData):
                 await ordersScene(ctx);
                 break;
             case /orders_page_backward/.test(callbackData):
@@ -58,6 +65,8 @@ export function createShopBot(token) {
                     await ordersScene(ctx);
                 }
                 break;
+            // case /order_page_by_id\:[0-9]+/.test(callbackData):
+                
             case /get_product [0-9]+/.test(callbackData):
                 getProduct(ctx);
                 break;
@@ -66,6 +75,10 @@ export function createShopBot(token) {
                 break;
             case /search/.test(callbackData):
                 await search(ctx);
+                break;
+            case /buy [0-9]+/.test(callbackData):
+                ctx.session.catalog.currentProductId = callbackData.slice(3);
+                await buyProductStep(ctx);
                 break;
         }
     });

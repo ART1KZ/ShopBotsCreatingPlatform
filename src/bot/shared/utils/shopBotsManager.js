@@ -74,7 +74,7 @@ export async function startAllActiveBots() {
         }
 
         if (!botTokensHashes || botTokensHashes.length === 0) {
-            console.log("Нет активных ботов для запуска.");
+            console.error("Нет активных ботов для запуска.");
             return;
         }
 

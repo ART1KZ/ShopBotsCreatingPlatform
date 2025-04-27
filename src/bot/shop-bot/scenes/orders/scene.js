@@ -58,7 +58,7 @@ function generateInlineKeyboard(orders) {
         InlineKeyboard.text(label, data),
     );
 
-    const backButtonRow = [InlineKeyboard.text("Назад", "menu")];
+    const backButtonRow = [InlineKeyboard.text("Назад", "main_menu")];
 
     return new InlineKeyboard([
         ...orderButtonCol,

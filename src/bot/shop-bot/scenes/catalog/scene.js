@@ -12,15 +12,12 @@ export async function getCategories(ctx) {
         .select("*")
         .eq("bot_token_hash", ctx.session.currentBotTokenHash)
         
-        console.log(shop);
-
         const categories = await supabase
         .from("categories")
         .select("*")
         .eq("shop_id", shop.data[0].id)
         .is("parent_id", null);
 
-        // console.log(categories);
         await ctx.editMessageText("Категории товаров", {
             reply_markup: {
                 inline_keyboard: [
@@ -65,10 +62,8 @@ export async function getCategory(ctx) {
         const parent_categories = await supabase
         .from("categories")
         .select("*")
-        .eq("shop_id", shop.data[0].id)
+        .eq("shop_id", shop.data[0]?.id)
         .eq("parent_id", category_id);
-
-        console.log(parent_categories);
 
         if (parent_categories.data.length > 0) {
             await ctx.editMessageText("Выберите категорию", {
@@ -166,13 +161,11 @@ export async function search(ctx) {
             })
         }
 
-        console.log('shop')
         const shop = await supabase
         .from("shops")
         .select("*")
         .eq("bot_token_hash", ctx.session.currentBotTokenHash)
 
-        console.log('categories')
         const categories = await supabase
         .from("categories")
         .select("*")
@@ -180,7 +173,6 @@ export async function search(ctx) {
 
         const items = []
 
-        console.log('products')
         for (const category of categories.data) {
             const products = await supabase
             .from("products")
@@ -192,7 +184,6 @@ export async function search(ctx) {
             }
         }
 
-        console.log(items + " prompt: " + ctx.message.text)
         const response = await fetch("https://api.mistral.ai/v1/agents/completions", {
             method: "POST",
             headers: {
