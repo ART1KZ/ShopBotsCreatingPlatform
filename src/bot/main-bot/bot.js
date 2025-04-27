@@ -27,6 +27,10 @@ import {
     editProductInputHandler,
     deleteProductHandler,
 } from "./scenes/editing-shop/managing-categories/scene.js";
+import {
+    generateCategoryAcceptHandler,
+    generateCategoryHandler,
+} from "./scenes/ai/category/scene.js";
 
 export const bot = new Bot(process.env.BOT_TOKEN);
 
@@ -94,6 +98,12 @@ bot.on("callback_query:data", async (ctx) => {
             break;
         case callbackData.startsWith("delete_product"):
             await deleteProductHandler(ctx);
+            break;
+        case callbackData.startsWith("generate_category_confirm"):
+            await generateCategoryAcceptHandler(ctx);
+            break;
+        case callbackData.startsWith("generate_category"):
+            await generateCategoryHandler(ctx);
             break;
     }
 

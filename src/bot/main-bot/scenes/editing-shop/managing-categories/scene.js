@@ -21,7 +21,10 @@ export async function getCategoriesHandler(ctx) {
             "<b>❌ Ошибка!</b>\nНе удалось загрузить список категорий.",
             {
                 parse_mode: "HTML",
-                reply_markup: new InlineKeyboard().text("🏠 В главное меню", "menu"),
+                reply_markup: new InlineKeyboard().text(
+                    "🏠 В главное меню",
+                    "menu"
+                ),
             }
         );
         return;
@@ -40,8 +43,10 @@ export async function getCategoriesHandler(ctx) {
         }
     }
 
-    keyboard.text("➕ Добавить категорию", `add_category_${shopId}`);
-    keyboard.text("❌ Назад", `manage_shop_${shopId}`);
+    keyboard
+        .text("➕ Добавить категорию", `add_category_${shopId}`)
+        .text("🧠 Сгенерировать категорию", `generate_category_${shopId}`).row()
+        .text("❌ Назад", `manage_shop_${shopId}`);
     await ctx.editMessageText(
         "<b>📍 Текущая позиция:</b> Категории\nВыберите категорию для управления:",
         {
@@ -129,13 +134,13 @@ export async function manageCategoryHandler(ctx) {
         .single();
 
     if (catError || !category) {
-        await ctx.editMessageText(
-            "<b>❌ Ошибка!</b>\nКатегория не найдена.",
-            {
-                parse_mode: "HTML",
-                reply_markup: new InlineKeyboard().text("🏠 В главное меню", "menu"),
-            }
-        );
+        await ctx.editMessageText("<b>❌ Ошибка!</b>\nКатегория не найдена.", {
+            parse_mode: "HTML",
+            reply_markup: new InlineKeyboard().text(
+                "🏠 В главное меню",
+                "menu"
+            ),
+        });
         return;
     }
 
@@ -143,7 +148,8 @@ export async function manageCategoryHandler(ctx) {
     const isSubcategory = category.parent_id !== null;
     const entityType = isSubcategory ? "Подкатегория" : "Категория";
     const entityName = category.name;
-    const parentCategoryName = isSubcategory && category.parent?.name ? category.parent.name : "";
+    const parentCategoryName =
+        isSubcategory && category.parent?.name ? category.parent.name : "";
 
     let messageText = `<b>📍 Текущая позиция:</b> ${entityType} "${entityName}"\n`;
     if (isSubcategory && parentCategoryName) {
@@ -163,7 +169,10 @@ export async function manageCategoryHandler(ctx) {
                 "<b>❌ Ошибка!</b>\nНе удалось загрузить подкатегории.",
                 {
                     parse_mode: "HTML",
-                    reply_markup: new InlineKeyboard().text("🏠 В главное меню", "menu"),
+                    reply_markup: new InlineKeyboard().text(
+                        "🏠 В главное меню",
+                        "menu"
+                    ),
                 }
             );
             return;
@@ -176,15 +185,27 @@ export async function manageCategoryHandler(ctx) {
                     `${subcategory.name}`,
                     `manage_category_${subcategory.id}_${shopId}`
                 );
-                if (index === subcategories.length - 1 || (index + 1) % 2 === 0) {
+                if (
+                    index === subcategories.length - 1 ||
+                    (index + 1) % 2 === 0
+                ) {
                     keyboard.row();
                 }
             }
             keyboard
-                .text("➕ Добавить подкатегорию", `add_subcategory_${categoryId}_${shopId}`)
+                .text(
+                    "➕ Добавить подкатегорию",
+                    `add_subcategory_${categoryId}_${shopId}`
+                )
                 .row()
-                .text("✏️ Изменить категорию", `edit_category_${categoryId}_${shopId}`)
-                .text("🗑️ Удалить категорию", `delete_category_${categoryId}_${shopId}`)
+                .text(
+                    "✏️ Изменить категорию",
+                    `edit_category_${categoryId}_${shopId}`
+                )
+                .text(
+                    "🗑️ Удалить категорию",
+                    `delete_category_${categoryId}_${shopId}`
+                )
                 .row()
                 .text("❌ Назад", `get_categories_${shopId}`);
             messageText = `<b>📍 Текущая позиция:</b> Категория "${entityName}"\nВыберите подкатегорию для управления:`;
@@ -206,7 +227,10 @@ export async function manageCategoryHandler(ctx) {
             "<b>❌ Ошибка!</b>\nНе удалось загрузить товары.",
             {
                 parse_mode: "HTML",
-                reply_markup: new InlineKeyboard().text("🏠 В главное меню", "menu"),
+                reply_markup: new InlineKeyboard().text(
+                    "🏠 В главное меню",
+                    "menu"
+                ),
             }
         );
         return;
@@ -227,12 +251,20 @@ export async function manageCategoryHandler(ctx) {
         keyboard
             .text("➕ Добавить товар", `add_product_${categoryId}_${shopId}`)
             .row()
-            .text("✏️ Изменить категорию", `edit_category_${categoryId}_${shopId}`)
-            .text("🗑️ Удалить категорию", `delete_category_${categoryId}_${shopId}`)
+            .text(
+                "✏️ Изменить категорию",
+                `edit_category_${categoryId}_${shopId}`
+            )
+            .text(
+                "🗑️ Удалить категорию",
+                `delete_category_${categoryId}_${shopId}`
+            )
             .row()
             .text(
                 "❌ Назад",
-                isSubcategory ? `manage_category_${category.parent_id}_${shopId}` : `get_categories_${shopId}`
+                isSubcategory
+                    ? `manage_category_${category.parent_id}_${shopId}`
+                    : `get_categories_${shopId}`
             );
         messageText = `<b>📍 Текущая позиция:</b> ${entityType} "${entityName}"\n`;
         if (isSubcategory && parentCategoryName) {
@@ -254,12 +286,19 @@ export async function manageCategoryHandler(ctx) {
         .row();
 
     if (!isSubcategory) {
-        keyboard.text("➕ Добавить подкатегорию", `add_subcategory_${categoryId}_${shopId}`).row();
+        keyboard
+            .text(
+                "➕ Добавить подкатегорию",
+                `add_subcategory_${categoryId}_${shopId}`
+            )
+            .row();
     }
 
     keyboard.text(
         "❌ Назад",
-        isSubcategory ? `manage_category_${category.parent_id}_${shopId}` : `get_categories_${shopId}`
+        isSubcategory
+            ? `manage_category_${category.parent_id}_${shopId}`
+            : `get_categories_${shopId}`
     );
 
     await ctx.editMessageText(messageText, {
@@ -286,13 +325,10 @@ export async function addSubcategoryHandler(ctx) {
 
     if (error || !category) {
         addCategoryKeyboard.text("🏠 В главное меню", "menu");
-        await ctx.editMessageText(
-            "<b>❌ Ошибка!</b>\nКатегория не найдена.",
-            {
-                parse_mode: "HTML",
-                reply_markup: addCategoryKeyboard,
-            }
-        );
+        await ctx.editMessageText("<b>❌ Ошибка!</b>\nКатегория не найдена.", {
+            parse_mode: "HTML",
+            reply_markup: addCategoryKeyboard,
+        });
         return;
     }
 
@@ -330,13 +366,10 @@ export async function addSubcategoryInputHandler(ctx) {
 
     if (error || !category) {
         successfullKeyboard.text("🏠 В главное меню", "menu");
-        await ctx.reply(
-            "<b>❌ Ошибка!</b>\nКатегория не найдена.",
-            {
-                parse_mode: "HTML",
-                reply_markup: successfullKeyboard,
-            }
-        );
+        await ctx.reply("<b>❌ Ошибка!</b>\nКатегория не найдена.", {
+            parse_mode: "HTML",
+            reply_markup: successfullKeyboard,
+        });
         return;
     }
 
@@ -398,24 +431,19 @@ export async function editCategoryHandler(ctx) {
 
     if (error || !category) {
         keyboard.text("🏠 В главное меню", "menu");
-        await ctx.editMessageText(
-            "<b>❌ Ошибка!</b>\nКатегория не найдена.",
-            {
-                parse_mode: "HTML",
-                reply_markup: keyboard,
-            }
-        );
+        await ctx.editMessageText("<b>❌ Ошибка!</b>\nКатегория не найдена.", {
+            parse_mode: "HTML",
+            reply_markup: keyboard,
+        });
         return;
     }
 
     const isSubcategory = category.parent_id !== null;
     const entityType = isSubcategory ? "Подкатегория" : "Категория";
-    const parentCategoryName = isSubcategory && category.parent?.name ? category.parent.name : "";
+    const parentCategoryName =
+        isSubcategory && category.parent?.name ? category.parent.name : "";
 
-    keyboard.text(
-        "❌ Отмена",
-        `manage_category_${categoryId}_${shopId}`
-    );
+    keyboard.text("❌ Отмена", `manage_category_${categoryId}_${shopId}`);
     ctx.session.step = `edit_category_input_${categoryId}_${shopId}`;
 
     let messageText = `<b>📍 Текущая позиция:</b> ${entityType} "${category.name}"\n`;
@@ -449,19 +477,17 @@ export async function editCategoryInputHandler(ctx) {
 
     if (error || !category) {
         keyboard.text("🏠 В главное меню", "menu");
-        await ctx.reply(
-            "<b>❌ Ошибка!</b>\nКатегория не найдена.",
-            {
-                parse_mode: "HTML",
-                reply_markup: keyboard,
-            }
-        );
+        await ctx.reply("<b>❌ Ошибка!</b>\nКатегория не найдена.", {
+            parse_mode: "HTML",
+            reply_markup: keyboard,
+        });
         return;
     }
 
     const isSubcategory = category.parent_id !== null;
     const entityType = isSubcategory ? "Подкатегория" : "Категория";
-    const parentCategoryName = isSubcategory && category.parent?.name ? category.parent.name : "";
+    const parentCategoryName =
+        isSubcategory && category.parent?.name ? category.parent.name : "";
 
     const { error: updateError } = await supabase
         .from("categories")
@@ -474,7 +500,9 @@ export async function editCategoryInputHandler(ctx) {
             `manage_category_${categoryId}_${shopId}`
         );
         await ctx.reply(
-            `<b>❌ Ошибка!</b>\nНе удалось обновить ${entityType.toLowerCase()} <b>"${category.name}"</b>.`,
+            `<b>❌ Ошибка!</b>\nНе удалось обновить ${entityType.toLowerCase()} <b>"${
+                category.name
+            }"</b>.`,
             {
                 parse_mode: "HTML",
                 reply_markup: keyboard,
@@ -518,19 +546,17 @@ export async function deleteCategoryHandler(ctx) {
 
     if (error || !category) {
         keyboard.text("🏠 В главное меню", "menu");
-        await ctx.editMessageText(
-            "<b>❌ Ошибка!</b>\nКатегория не найдена.",
-            {
-                parse_mode: "HTML",
-                reply_markup: keyboard,
-            }
-        );
+        await ctx.editMessageText("<b>❌ Ошибка!</b>\nКатегория не найдена.", {
+            parse_mode: "HTML",
+            reply_markup: keyboard,
+        });
         return;
     }
 
     const isSubcategory = category.parent_id !== null;
     const entityType = isSubcategory ? "Подкатегория" : "Категория";
-    const parentCategoryName = isSubcategory && category.parent?.name ? category.parent.name : "";
+    const parentCategoryName =
+        isSubcategory && category.parent?.name ? category.parent.name : "";
 
     const { error: deleteError } = await supabase
         .from("categories")
@@ -543,7 +569,9 @@ export async function deleteCategoryHandler(ctx) {
             `manage_category_${categoryId}_${shopId}`
         );
         await ctx.editMessageText(
-            `<b>❌ Ошибка!</b>\nНе удалось удалить ${entityType.toLowerCase()} <b>"${category.name}"</b>.`,
+            `<b>❌ Ошибка!</b>\nНе удалось удалить ${entityType.toLowerCase()} <b>"${
+                category.name
+            }"</b>.`,
             {
                 parse_mode: "HTML",
                 reply_markup: keyboard,
@@ -554,7 +582,9 @@ export async function deleteCategoryHandler(ctx) {
 
     keyboard.text(
         "🔙 Вернуться назад",
-        isSubcategory ? `manage_category_${category.parent_id}_${shopId}` : `get_categories_${shopId}`
+        isSubcategory
+            ? `manage_category_${category.parent_id}_${shopId}`
+            : `get_categories_${shopId}`
     );
     let messageText = `<b>✅ Успех!</b>\n${entityType} <b>"${category.name}"</b> и все связанные записи успешно удалены`;
     if (isSubcategory && parentCategoryName) {
@@ -586,31 +616,27 @@ export async function addProductHandler(ctx) {
 
     if (error || !category) {
         keyboard.text("🏠 В главное меню", "menu");
-        await ctx.editMessageText(
-            "<b>❌ Ошибка!</b>\nКатегория не найдена.",
-            {
-                parse_mode: "HTML",
-                reply_markup: keyboard,
-            }
-        );
+        await ctx.editMessageText("<b>❌ Ошибка!</b>\nКатегория не найдена.", {
+            parse_mode: "HTML",
+            reply_markup: keyboard,
+        });
         return;
     }
 
     const isSubcategory = category.parent_id !== null;
     const entityType = isSubcategory ? "Подкатегория" : "Категория";
-    const parentCategoryName = isSubcategory && category.parent?.name ? category.parent.name : "";
+    const parentCategoryName =
+        isSubcategory && category.parent?.name ? category.parent.name : "";
 
-    keyboard.text(
-        "❌ Отмена",
-        `manage_category_${categoryId}_${shopId}`
-    );
+    keyboard.text("❌ Отмена", `manage_category_${categoryId}_${shopId}`);
     ctx.session.step = `add_product_input_${categoryId}_${shopId}`;
 
     let messageText = `<b>📍 Текущая позиция:</b> Добавление товара\n<b>🗂 ${entityType}:</b> ${category.name}\n`;
     if (isSubcategory && parentCategoryName) {
         messageText += `<b>📚 Категория:</b> ${parentCategoryName}\n`;
     }
-    messageText += "Введите данные нового товара в формате:\n• Название: [название]\n• Цена: [цена]";
+    messageText +=
+        "Введите данные нового товара в формате:\n• Название: [название]\n• Цена: [цена]";
 
     await ctx.editMessageText(messageText, {
         parse_mode: "HTML",
@@ -637,31 +663,28 @@ export async function addProductInputHandler(ctx) {
 
     if (error || !category) {
         keyboard.text("🏠 В главное меню", "menu");
-        await ctx.reply(
-            "<b>❌ Ошибка!</b>\nКатегория не найдена.",
-            {
-                parse_mode: "HTML",
-                reply_markup: keyboard,
-            }
-        );
+        await ctx.reply("<b>❌ Ошибка!</b>\nКатегория не найдена.", {
+            parse_mode: "HTML",
+            reply_markup: keyboard,
+        });
         return;
     }
 
     const isSubcategory = category.parent_id !== null;
     const entityType = isSubcategory ? "Подкатегория" : "Категория";
-    const parentCategoryName = isSubcategory && category.parent?.name ? category.parent.name : "";
+    const parentCategoryName =
+        isSubcategory && category.parent?.name ? category.parent.name : "";
 
     // Парсинг ввода пользователя
     const nameMatch = inputText.match(/Название:\s*(.+)/i);
     const priceMatch = inputText.match(/Цена:\s*(\d+\.?\d*)/i);
 
     if (!nameMatch || !priceMatch) {
-        keyboard.text(
-            "❌ Отмена",
-            `manage_category_${categoryId}_${shopId}`
-        );
+        keyboard.text("❌ Отмена", `manage_category_${categoryId}_${shopId}`);
         await ctx.reply(
-            `<b>❌ Ошибка!</b>\nНеверный формат ввода для ${entityType.toLowerCase()} <b>"${category.name}"</b>. Пожалуйста, используйте формат:\n• Название: [название]\n• Цена: [цена]`,
+            `<b>❌ Ошибка!</b>\nНеверный формат ввода для ${entityType.toLowerCase()} <b>"${
+                category.name
+            }"</b>. Пожалуйста, используйте формат:\n• Название: [название]\n• Цена: [цена]`,
             {
                 parse_mode: "HTML",
                 reply_markup: keyboard,
@@ -674,12 +697,11 @@ export async function addProductInputHandler(ctx) {
     const productPrice = parseFloat(priceMatch[1]);
 
     if (isNaN(productPrice) || productPrice <= 0) {
-        keyboard.text(
-            "❌ Отмена",
-            `manage_category_${categoryId}_${shopId}`
-        );
+        keyboard.text("❌ Отмена", `manage_category_${categoryId}_${shopId}`);
         await ctx.reply(
-            `<b>❌ Ошибка!</b>\nЦена должна быть числом больше 0 для ${entityType.toLowerCase()} <b>"${category.name}"</b>.`,
+            `<b>❌ Ошибка!</b>\nЦена должна быть числом больше 0 для ${entityType.toLowerCase()} <b>"${
+                category.name
+            }"</b>.`,
             {
                 parse_mode: "HTML",
                 reply_markup: keyboard,
@@ -705,7 +727,9 @@ export async function addProductInputHandler(ctx) {
             `manage_category_${categoryId}_${shopId}`
         );
         await ctx.reply(
-            `<b>❌ Ошибка!</b>\nНе удалось добавить товар <b>"${productName}"</b> в ${entityType.toLowerCase()} <b>"${category.name}"</b>.`,
+            `<b>❌ Ошибка!</b>\nНе удалось добавить товар <b>"${productName}"</b> в ${entityType.toLowerCase()} <b>"${
+                category.name
+            }"</b>.`,
             {
                 parse_mode: "HTML",
                 reply_markup: keyboard,
@@ -719,7 +743,9 @@ export async function addProductInputHandler(ctx) {
         "🔙 Вернуться к категории",
         `manage_category_${categoryId}_${shopId}`
     );
-    let messageText = `<b>✅ Успех!</b>\nТовар <b>"${productName}"</b> успешно добавлен в ${entityType.toLowerCase()} <b>"${category.name}"</b>`;
+    let messageText = `<b>✅ Успех!</b>\nТовар <b>"${productName}"</b> успешно добавлен в ${entityType.toLowerCase()} <b>"${
+        category.name
+    }"</b>`;
     if (isSubcategory && parentCategoryName) {
         messageText += ` (Категория <b>"${parentCategoryName}"</b>)`;
     }
@@ -743,7 +769,8 @@ export async function manageProductHandler(ctx) {
 
     let { data: product, error } = await supabase
         .from("products")
-        .select(`
+        .select(
+            `
             *,
             categories (
                 id,
@@ -751,26 +778,25 @@ export async function manageProductHandler(ctx) {
                 parent_id,
                 parent:categories!parent_id(name)
             )
-        `)
+        `
+        )
         .eq("id", productId)
         .single();
 
     if (error || !product) {
         keyboard.text("🏠 В главное меню", "menu");
-        await ctx.editMessageText(
-            "<b>❌ Ошибка!</b>\nТовар не найден.",
-            {
-                parse_mode: "HTML",
-                reply_markup: keyboard,
-            }
-        );
+        await ctx.editMessageText("<b>❌ Ошибка!</b>\nТовар не найден.", {
+            parse_mode: "HTML",
+            reply_markup: keyboard,
+        });
         return;
     }
 
     const category = product.categories;
     const isSubcategory = category.parent_id !== null;
     const entityType = isSubcategory ? "Подкатегория" : "Категория";
-    const parentCategoryName = isSubcategory && category.parent?.name ? category.parent.name : "";
+    const parentCategoryName =
+        isSubcategory && category.parent?.name ? category.parent.name : "";
 
     keyboard
         .text("✏️ Изменить товар", `edit_product_${productId}_${shopId}`)
@@ -802,7 +828,8 @@ export async function editProductHandler(ctx) {
 
     let { data: product, error } = await supabase
         .from("products")
-        .select(`
+        .select(
+            `
             *,
             categories (
                 id,
@@ -810,26 +837,25 @@ export async function editProductHandler(ctx) {
                 parent_id,
                 parent:categories!parent_id(name)
             )
-        `)
+        `
+        )
         .eq("id", productId)
         .single();
 
     if (error || !product) {
         keyboard.text("🏠 В главное меню", "menu");
-        await ctx.editMessageText(
-            "<b>❌ Ошибка!</b>\nТовар не найден.",
-            {
-                parse_mode: "HTML",
-                reply_markup: keyboard,
-            }
-        );
+        await ctx.editMessageText("<b>❌ Ошибка!</b>\nТовар не найден.", {
+            parse_mode: "HTML",
+            reply_markup: keyboard,
+        });
         return;
     }
 
     const category = product.categories;
     const isSubcategory = category.parent_id !== null;
     const entityType = isSubcategory ? "Подкатегория" : "Категория";
-    const parentCategoryName = isSubcategory && category.parent?.name ? category.parent.name : "";
+    const parentCategoryName =
+        isSubcategory && category.parent?.name ? category.parent.name : "";
 
     keyboard.text("❌ Отмена", `manage_product_${productId}_${shopId}`);
     ctx.session.step = `edit_product_input_${productId}_${shopId}`;
@@ -859,7 +885,8 @@ export async function editProductInputHandler(ctx) {
 
     let { data: product, error } = await supabase
         .from("products")
-        .select(`
+        .select(
+            `
             *,
             categories (
                 id,
@@ -867,26 +894,25 @@ export async function editProductInputHandler(ctx) {
                 parent_id,
                 parent:categories!parent_id(name)
             )
-        `)
+        `
+        )
         .eq("id", productId)
         .single();
 
     if (error || !product) {
         keyboard.text("🏠 В главное меню", "menu");
-        await ctx.reply(
-            "<b>❌ Ошибка!</b>\nТовар не найден.",
-            {
-                parse_mode: "HTML",
-                reply_markup: keyboard,
-            }
-        );
+        await ctx.reply("<b>❌ Ошибка!</b>\nТовар не найден.", {
+            parse_mode: "HTML",
+            reply_markup: keyboard,
+        });
         return;
     }
 
     const category = product.categories;
     const isSubcategory = category.parent_id !== null;
     const entityType = isSubcategory ? "Подкатегория" : "Категория";
-    const parentCategoryName = isSubcategory && category.parent?.name ? category.parent.name : "";
+    const parentCategoryName =
+        isSubcategory && category.parent?.name ? category.parent.name : "";
 
     // Парсинг ввода пользователя
     const nameMatch = inputText.match(/Название:\s*(.+)/i);
@@ -895,7 +921,11 @@ export async function editProductInputHandler(ctx) {
     if (!nameMatch || !priceMatch) {
         keyboard.text("❌ Отмена", `manage_product_${productId}_${shopId}`);
         await ctx.reply(
-            `<b>❌ Ошибка!</b>\nНеверный формат ввода для товара <b>"${product.name}"</b> в ${entityType.toLowerCase()} <b>"${category.name}"</b>. Пожалуйста, используйте формат:\n• Название: [название]\n• Цена: [цена]`,
+            `<b>❌ Ошибка!</b>\nНеверный формат ввода для товара <b>"${
+                product.name
+            }"</b> в ${entityType.toLowerCase()} <b>"${
+                category.name
+            }"</b>. Пожалуйста, используйте формат:\n• Название: [название]\n• Цена: [цена]`,
             {
                 parse_mode: "HTML",
                 reply_markup: keyboard,
@@ -910,7 +940,9 @@ export async function editProductInputHandler(ctx) {
     if (isNaN(productPrice) || productPrice <= 0) {
         keyboard.text("❌ Отмена", `manage_product_${productId}_${shopId}`);
         await ctx.reply(
-            `<b>❌ Ошибка!</b>\nЦена должна быть числом больше 0 для товара <b>"${product.name}"</b> в ${entityType.toLowerCase()} <b>"${category.name}"</b>.`,
+            `<b>❌ Ошибка!</b>\nЦена должна быть числом больше 0 для товара <b>"${
+                product.name
+            }"</b> в ${entityType.toLowerCase()} <b>"${category.name}"</b>.`,
             {
                 parse_mode: "HTML",
                 reply_markup: keyboard,
@@ -933,7 +965,9 @@ export async function editProductInputHandler(ctx) {
             `manage_product_${productId}_${shopId}`
         );
         await ctx.reply(
-            `<b>❌ Ошибка!</b>\nНе удалось обновить товар <b>"${product.name}"</b> в ${entityType.toLowerCase()} <b>"${category.name}"</b>.`,
+            `<b>❌ Ошибка!</b>\nНе удалось обновить товар <b>"${
+                product.name
+            }"</b> в ${entityType.toLowerCase()} <b>"${category.name}"</b>.`,
             {
                 parse_mode: "HTML",
                 reply_markup: keyboard,
@@ -947,7 +981,9 @@ export async function editProductInputHandler(ctx) {
         "🔙 Вернуться к товару",
         `manage_product_${productId}_${shopId}`
     );
-    let messageText = `<b>✅ Успех!</b>\nТовар <b>"${productName}"</b> успешно обновлен в ${entityType.toLowerCase()} <b>"${category.name}"</b>`;
+    let messageText = `<b>✅ Успех!</b>\nТовар <b>"${productName}"</b> успешно обновлен в ${entityType.toLowerCase()} <b>"${
+        category.name
+    }"</b>`;
     if (isSubcategory && parentCategoryName) {
         messageText += ` (Категория <b>"${parentCategoryName}"</b>)`;
     }
@@ -971,7 +1007,8 @@ export async function deleteProductHandler(ctx) {
 
     let { data: product, error } = await supabase
         .from("products")
-        .select(`
+        .select(
+            `
             *,
             categories (
                 id,
@@ -979,26 +1016,25 @@ export async function deleteProductHandler(ctx) {
                 parent_id,
                 parent:categories!parent_id(name)
             )
-        `)
+        `
+        )
         .eq("id", productId)
         .single();
 
     if (error || !product) {
         keyboard.text("🏠 В главное меню", "menu");
-        await ctx.editMessageText(
-            "<b>❌ Ошибка!</b>\nТовар не найден.",
-            {
-                parse_mode: "HTML",
-                reply_markup: keyboard,
-            }
-        );
+        await ctx.editMessageText("<b>❌ Ошибка!</b>\nТовар не найден.", {
+            parse_mode: "HTML",
+            reply_markup: keyboard,
+        });
         return;
     }
 
     const category = product.categories;
     const isSubcategory = category.parent_id !== null;
     const entityType = isSubcategory ? "Подкатегория" : "Категория";
-    const parentCategoryName = isSubcategory && category.parent?.name ? category.parent.name : "";
+    const parentCategoryName =
+        isSubcategory && category.parent?.name ? category.parent.name : "";
 
     const { error: deleteError } = await supabase
         .from("products")
@@ -1011,7 +1047,9 @@ export async function deleteProductHandler(ctx) {
             `manage_product_${productId}_${shopId}`
         );
         await ctx.editMessageText(
-            `<b>❌ Ошибка!</b>\nНе удалось удалить товар <b>"${product.name}"</b> в ${entityType.toLowerCase()} <b>"${category.name}"</b>.`,
+            `<b>❌ Ошибка!</b>\nНе удалось удалить товар <b>"${
+                product.name
+            }"</b> в ${entityType.toLowerCase()} <b>"${category.name}"</b>.`,
             {
                 parse_mode: "HTML",
                 reply_markup: keyboard,
@@ -1024,7 +1062,11 @@ export async function deleteProductHandler(ctx) {
         "🔙 Вернуться к категории",
         `manage_category_${category.id}_${shopId}`
     );
-    let messageText = `<b>✅ Успех!</b>\nТовар <b>"${product.name}"</b> и все связанные записи успешно удалены из ${entityType.toLowerCase()} <b>"${category.name}"</b>`;
+    let messageText = `<b>✅ Успех!</b>\nТовар <b>"${
+        product.name
+    }"</b> и все связанные записи успешно удалены из ${entityType.toLowerCase()} <b>"${
+        category.name
+    }"</b>`;
     if (isSubcategory && parentCategoryName) {
         messageText += ` (Категория <b>"${parentCategoryName}"</b>)`;
     }
