@@ -12,7 +12,6 @@ export async function getCategories(ctx) {
         .select("*")
         .eq("bot_token_hash", ctx.session.currentBotTokenHash)
         
-        console.log(shop);
 
         const categories = await supabase
         .from("categories")
@@ -20,7 +19,6 @@ export async function getCategories(ctx) {
         .eq("shop_id", shop.data[0].id)
         .is("parent_id", null);
 
-        // console.log(categories);
         await ctx.editMessageText("Категории товаров", {
             reply_markup: {
                 inline_keyboard: [
@@ -68,7 +66,6 @@ export async function getCategory(ctx) {
         .eq("shop_id", shop.data[0].id)
         .eq("parent_id", category_id);
 
-        console.log(parent_categories);
 
         if (parent_categories.data.length > 0) {
             await ctx.editMessageText("Выберите категорию", {
@@ -166,13 +163,11 @@ export async function search(ctx) {
             })
         }
 
-        console.log('shop')
         const shop = await supabase
         .from("shops")
         .select("*")
         .eq("bot_token_hash", ctx.session.currentBotTokenHash)
 
-        console.log('categories')
         const categories = await supabase
         .from("categories")
         .select("*")
@@ -180,7 +175,6 @@ export async function search(ctx) {
 
         const items = []
 
-        console.log('products')
         for (const category of categories.data) {
             const products = await supabase
             .from("products")
@@ -192,7 +186,6 @@ export async function search(ctx) {
             }
         }
 
-        console.log(items + " prompt: " + ctx.message.text)
         const response = await fetch("https://api.mistral.ai/v1/agents/completions", {
             method: "POST",
             headers: {
@@ -203,18 +196,16 @@ export async function search(ctx) {
                 messages: [
                     {
                         role: "user",
-                        content: items + "\n\nprompt: " + ctx.message.text,
+                        content: JSON.stringify(items) + "\n\nprompt: " + ctx.message.text,
                     }
                 ],
                 agent_id: process.env.MISTRAL_AGENT_ID,
-                // max_tokens: 0
             })
         })
 
         if (response.status !== 200) return console.error(response);
         const data = await response.json();
 
-        // ctx.reply(data.choices[0].message.content);
         const answer = JSON.parse(data.choices[0].message.content.replace('\`\`\`json\n', '').replace('\`\`\`', ''));;
 
         if (answer.error_message) return await ctx.reply(answer.error_message, {
@@ -231,7 +222,7 @@ export async function search(ctx) {
         const product = await supabase
         .from("products")
         .select("*")
-        .eq("id", answer.id);
+        .eq("id", answer.product_id);
 
         await ctx.reply(`${product.data[0].name} - ${product.data[0].price}`, {
             reply_markup: {
@@ -247,6 +238,8 @@ export async function search(ctx) {
                 ]
             }
         });
+
+        ctx.session.step = null;
     }
     catch(error) {
         console.error(error);
