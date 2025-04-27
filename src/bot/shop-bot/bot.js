@@ -1,6 +1,7 @@
 import { Bot, session } from "grammy";
-import { getCategories, getCart, mainScene } from "./scenes/main/scene.js";
 import { ordersScene } from "./scenes/orders/scene.js";
+import { mainScene } from "./scenes/main/scene.js";
+import { getCategories, getCategory, getProduct, search } from "./scenes/catalog/scene.js";
 
 /**
  * Возвращаяет экземпляр бота-магазина
@@ -18,6 +19,7 @@ export function createShopBot(token) {
                     currentPage: 0,
                     maxPage: 0,
                 },
+                currentBotTokenHash: undefined, // Последний введенный токен бота пользователем
             }),
         }),
     );
@@ -27,27 +29,26 @@ export function createShopBot(token) {
     bot.on("callback_query:data", async (ctx) => {
         const callbackData = ctx.callbackQuery.data;
 
-        switch (callbackData) {
-            case "menu":
-                await mainScene(ctx, true);
-                break;
-            case "get_products":
+
+        switch (true) {
+            case /get_categories/.test(callbackData):
                 await getCategories(ctx);
                 break;
-            case "get_cart":
-                await getCart(ctx);
+            case /get_category [0-9]+/.test(callbackData):
+                console.log('checked')
+                await getCategory(ctx);
                 break;
-            case "orders":
+            case /orders/.test(callbackData):
                 await ordersScene(ctx);
                 break;
-            case "orders_page_backward":
+            case /orders_page_backward/.test(callbackData):
                 if (ctx.session.orders.currentPage - 1 >= 0) {
                     ctx.session.orders.currentPage =
                         ctx.session.orders.currentPage - 1;
                     await ordersScene(ctx);
                 }
                 break;
-            case "orders_page_forward":
+            case /orders_page_forward/.test(callbackData):
                 if (
                     ctx.session.orders.currentPage + 1 <=
                     ctx.session.orders.maxPage
@@ -57,6 +58,21 @@ export function createShopBot(token) {
                     await ordersScene(ctx);
                 }
                 break;
+            case /get_product [0-9]+/.test(callbackData):
+                getProduct(ctx);
+                break;
+            case /main_menu/.test(callbackData):
+                await mainScene(ctx);
+                break;
+            case /search/.test(callbackData):
+                await search(ctx);
+                break;
+        }
+    });
+
+    bot.on("message:text", async (ctx) => {
+        if (ctx.session.step === "search_input") {
+            await search(ctx);
         }
     });
 

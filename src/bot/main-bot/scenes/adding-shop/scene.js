@@ -11,7 +11,7 @@ import { sendUnexpectedErrorMessage } from "../../../shared/utils/error.js";
  * @param {Context} ctx
  */
 export async function createShopHandler(ctx) {
-    ctx.session.step = "token_input";
+    ctx.session.step = "add_bot_token_input";
 
     await ctx.editMessageText("🔑 Отправьте токен вашего бота", {
         reply_markup: new InlineKeyboard().text("❌ Назад", "menu"),
@@ -22,7 +22,7 @@ export async function createShopHandler(ctx) {
  * Обрабатывает введеный пользователем токен бота и создает новый магазин, если еще не существует
  * @param {Context} ctx
  */
-export async function tokenInputHandler(ctx) {
+export async function addBotTokenInputHandler(ctx) {
     ctx.session.step = undefined;
 
     const userMessage = ctx.message.text.trim();
