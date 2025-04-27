@@ -194,26 +194,33 @@ export async function search(ctx) {
                 messages: [
                     {
                         role: "user",
-                        content: items + "\n\nprompt: " + ctx.message.text,
+                        content: JSON.stringify(items) + "\n\nprompt: " + ctx.message.text,
                     }
                 ],
                 agent_id: process.env.MISTRAL_AGENT_ID,
-                // max_tokens: 0
             })
         })
 
         if (response.status !== 200) return console.error(response);
         const data = await response.json();
 
-        // ctx.reply(data.choices[0].message.content);
         const answer = JSON.parse(data.choices[0].message.content.replace('\`\`\`json\n', '').replace('\`\`\`', ''));;
 
-        if (answer.error_message) return await ctx.reply(answer.error_message);
+        if (answer.error_message) return await ctx.reply(answer.error_message, {
+            reply_markup: {
+                inline_keyboard: [
+                    [{
+                        text: "❌ Назад",
+                        callback_data: "get_categories",
+                    }]
+                ]
+            }
+        });
 
         const product = await supabase
         .from("products")
         .select("*")
-        .eq("id", answer.id);
+        .eq("id", answer.product_id);
 
         await ctx.reply(`${product.data[0].name} - ${product.data[0].price}`, {
             reply_markup: {
@@ -229,6 +236,8 @@ export async function search(ctx) {
                 ]
             }
         });
+
+        ctx.session.step = null;
     }
     catch(error) {
         console.error(error);
