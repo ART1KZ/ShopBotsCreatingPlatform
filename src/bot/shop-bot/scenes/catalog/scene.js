@@ -217,7 +217,16 @@ export async function search(ctx) {
         // ctx.reply(data.choices[0].message.content);
         const answer = JSON.parse(data.choices[0].message.content.replace('\`\`\`json\n', '').replace('\`\`\`', ''));;
 
-        if (answer.error_message) return await ctx.reply(answer.error_message);
+        if (answer.error_message) return await ctx.reply(answer.error_message, {
+            reply_markup: {
+                inline_keyboard: [
+                    [{
+                        text: "❌ Назад",
+                        callback_data: "get_categories",
+                    }]
+                ]
+            }
+        });
 
         const product = await supabase
         .from("products")
