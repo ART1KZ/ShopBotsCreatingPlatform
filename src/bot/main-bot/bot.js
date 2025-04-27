@@ -15,9 +15,18 @@ import {
     addSubcategoryHandler,
     getCategoriesHandler,
     manageCategoryHandler,
-    addSubcategoryInputHandler
+    addSubcategoryInputHandler,
+    addCategoryInputHandler,
+    editCategoryHandler,
+    editCategoryInputHandler,
+    deleteCategoryHandler,
+    addProductHandler,
+    addProductInputHandler,
+    manageProductHandler,
+    editProductHandler,
+    editProductInputHandler,
+    deleteProductHandler,
 } from "./scenes/editing-shop/managing-categories/scene.js";
-import { addCategoryInputHandler } from "./scenes/editing-shop/managing-categories/scene.js";
 
 export const bot = new Bot(process.env.BOT_TOKEN);
 
@@ -68,8 +77,23 @@ bot.on("callback_query:data", async (ctx) => {
         case callbackData.startsWith("add_subcategory"):
             await addSubcategoryHandler(ctx);
             break;
+        case callbackData.startsWith("edit_category"):
+            await editCategoryHandler(ctx);
+            break;
+        case callbackData.startsWith("delete_category"):
+            await deleteCategoryHandler(ctx);
+            break;
         case callbackData.startsWith("add_product"):
             await addProductHandler(ctx);
+            break;
+        case callbackData.startsWith("manage_product"):
+            await manageProductHandler(ctx);
+            break;
+        case callbackData.startsWith("edit_product"):
+            await editProductHandler(ctx);
+            break;
+        case callbackData.startsWith("delete_product"):
+            await deleteProductHandler(ctx);
             break;
     }
 
@@ -87,8 +111,14 @@ bot.on("message", async (ctx) => {
         case ctx.session.step.startsWith("add_subcategory_input"):
             await addSubcategoryInputHandler(ctx);
             break;
+        case ctx.session.step.startsWith("edit_category_input"):
+            await editCategoryInputHandler(ctx);
+            break;
         case ctx.session.step.startsWith("add_product_input"):
             await addProductInputHandler(ctx);
+            break;
+        case ctx.session.step.startsWith("edit_product_input"):
+            await editProductInputHandler(ctx);
             break;
         default:
             await sendDontUnderstandErrorMessage(ctx);
