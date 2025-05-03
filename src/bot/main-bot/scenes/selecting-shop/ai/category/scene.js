@@ -1,7 +1,7 @@
-import { supabase } from "../../../../shared/utils/database/index.js";
+import { supabase } from "../../../../../shared/utils/database/index.js";
 import { Context, InlineKeyboard } from "grammy";
-import { sendRequestToMistralAgent } from "../../../../shared/utils/ai-api.js";
-import { decryptData } from "../../../../shared/utils/encryption.js";
+import { sendRequestToMistralAgent } from "../../../../../shared/utils/ai-api.js";
+import { decryptData } from "../../../../../shared/utils/encryption.js";
 import { Bot } from "grammy";
 
 /**
@@ -82,7 +82,7 @@ export async function generateCategoryHandler(ctx) {
         return;
     }
 
-    const newCategory = response.category;
+    const newCategory = response.category.split(' ').join('_');;
 
     // Формируем меню с подтверждением
     const keyboard = new InlineKeyboard()
@@ -95,7 +95,7 @@ export async function generateCategoryHandler(ctx) {
         .text("🏠 В главное меню", "menu");
 
     await ctx.editMessageText(
-        `<b>📍 Текущая позиция:</b> Категории\n<b>🏪 Магазин:</b> ${shopName}\n<b>➕ Предложенная категория:</b> ${newCategory}\nХотите добавить эту категорию?`,
+        `<b>📍 Текущая позиция:</b> Категории\n<b>🏪 Магазин:</b> ${shopName}\n<b>➕ Предложенная категория:</b> ${newCategory.split("_").join(" ")}\n` + `Хотите добавить эту категорию?`,
         {
             parse_mode: "HTML",
             reply_markup: keyboard,
@@ -111,7 +111,11 @@ export async function generateCategoryAcceptHandler(ctx) {
     const callbackDataParts = ctx.callbackQuery.data.split("_");
 
     const shopId = callbackDataParts[3];
-    const newCategory = callbackDataParts[4]
+    let newCategory = "";
+
+    for(let i = 4; i < callbackDataParts.length; i++) {
+        newCategory += callbackDataParts[i] + ' ';
+    }
 
     // Добавляем категорию в базу данных
     const { error } = await supabase

@@ -103,7 +103,6 @@ async function getOrders(ctx, page) {
 /**
  * Всего заказов
  * @param {Context} ctx
- * @returns {number} число заказов
  */
 async function getQuantityOrders(ctx) {
     const userId = ctx?.callbackQuery?.from?.id;

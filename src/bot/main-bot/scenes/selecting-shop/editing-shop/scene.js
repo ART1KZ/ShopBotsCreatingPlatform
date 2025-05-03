@@ -1,11 +1,11 @@
 import { Context } from "grammy";
-import { supabase } from "../../../shared/utils/database/index.js";
-import { decryptData } from "../../../shared/utils/encryption.js";
+import { supabase } from "../../../../shared/utils/database/index.js";
+import { decryptData } from "../../../../shared/utils/encryption.js";
 import {
     startShopBot,
     stopShopBot,
-} from "../../../shared/utils/shopBotsManager.js";
-import { manageShopHandler } from "../selecting-shop/scene.js"
+} from "../../../../shared/utils/shopBotsManager.js";
+import { manageShopHandler } from "../scene.js"
 
 /**
  * Включает или выключает бота. Изменяет текущие данные бота в настройках на новые.

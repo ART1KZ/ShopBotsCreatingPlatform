@@ -8,6 +8,7 @@ import {
     search,
 } from "./scenes/catalog/scene.js";
 import { buyProductStep } from "./scenes/catalog/steps/buyProduct.js";
+import { orderScene } from "./scenes/order/scene.js";
 
 /**
  * Возвращаяет экземпляр бота-магазина
@@ -24,6 +25,9 @@ export function createShopBot(token) {
                 orders: {
                     currentPage: 0,
                     maxPage: 0,
+                },
+                order: {
+                    currentEntryId: -1
                 },
                 catalog: {
                     currentProductId: -1,
@@ -65,15 +69,17 @@ export function createShopBot(token) {
                     await ordersScene(ctx);
                 }
                 break;
-            // case /order_page_by_id\:[0-9]+/.test(callbackData):
-                
+            case /order_page_by_id\:[0-9]+/.test(callbackData):
+                ctx.session.order.currentEntryId = /order_page_by_id\:([0-9]+)/.exec(callbackData)[1];
+                await orderScene(ctx);
+                break;
             case /get_product [0-9]+/.test(callbackData):
-                getProduct(ctx);
+                await getProduct(ctx);
                 break;
             case /main_menu/.test(callbackData):
                 await mainScene(ctx);
                 break;
-            case /search/.test(callbackData):
+            case /search$/.test(callbackData):
                 await search(ctx);
                 break;
             case /buy [0-9]+/.test(callbackData):

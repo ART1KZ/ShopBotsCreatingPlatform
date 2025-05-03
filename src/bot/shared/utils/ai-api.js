@@ -6,7 +6,7 @@
  * @throws {Error} - Если запрос не удался или ответ некорректен.
  */
 export async function sendRequestToMistralAgent(agentId, json) {
-    console.log(json)
+    // console.log(json)
     // Проверяем входные параметры
     if (!agentId || typeof agentId !== "string") {
         throw new Error("agentId должен быть непустой строкой");
@@ -60,6 +60,7 @@ export async function sendRequestToMistralAgent(agentId, json) {
     try {
         return JSON.parse(responseJson.choices[0].message.content);
     } catch (parseError) {
+        // console.log(responseJson.choices[0].message.content)
         throw new Error("Не удалось разобрать JSON в ответе агента");
     }
 }

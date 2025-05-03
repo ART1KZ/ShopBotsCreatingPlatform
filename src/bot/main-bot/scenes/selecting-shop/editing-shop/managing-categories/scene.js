@@ -1,4 +1,4 @@
-import { supabase } from "../../../../shared/utils/database/index.js";
+import { supabase } from "../../../../../shared/utils/database/index.js";
 import { Context, InlineKeyboard } from "grammy";
 
 /**
@@ -45,7 +45,8 @@ export async function getCategoriesHandler(ctx) {
 
     keyboard
         .text("➕ Добавить категорию", `add_category_${shopId}`)
-        .text("🧠 Сгенерировать категорию", `generate_category_${shopId}`).row()
+        .text("🧠 Сгенерировать категорию", `generate_category_${shopId}`)
+        .row()
         .text("❌ Назад", `manage_shop_${shopId}`);
     await ctx.editMessageText(
         "<b>📍 Текущая позиция:</b> Категории\nВыберите категорию для управления:",
@@ -197,6 +198,10 @@ export async function manageCategoryHandler(ctx) {
                     "➕ Добавить подкатегорию",
                     `add_subcategory_${categoryId}_${shopId}`
                 )
+                .text(
+                    "🧠 Сгенерировать подкатегорию",
+                    `generate_subcategory_${shopId}_${categoryId}`
+                )
                 .row()
                 .text(
                     "✏️ Изменить категорию",
@@ -277,6 +282,18 @@ export async function manageCategoryHandler(ctx) {
         });
     }
 
+    if (!isSubcategory) {
+        keyboard
+            .text(
+                "➕ Добавить подкатегорию",
+                `add_subcategory_${categoryId}_${shopId}`
+            )
+            .text(
+                "🧠 Сгенерировать подкатегорию",
+                `generate_subcategory_${shopId}_${categoryId}`
+            )
+            .row();
+    }
     // Если нет подкатегорий и товаров
     keyboard
         .text("➕ Добавить товар", `add_product_${categoryId}_${shopId}`)
@@ -284,15 +301,6 @@ export async function manageCategoryHandler(ctx) {
         .text("✏️ Изменить категорию", `edit_category_${categoryId}_${shopId}`)
         .text("🗑️ Удалить категорию", `delete_category_${categoryId}_${shopId}`)
         .row();
-
-    if (!isSubcategory) {
-        keyboard
-            .text(
-                "➕ Добавить подкатегорию",
-                `add_subcategory_${categoryId}_${shopId}`
-            )
-            .row();
-    }
 
     keyboard.text(
         "❌ Назад",
@@ -710,7 +718,7 @@ export async function addProductInputHandler(ctx) {
         return;
     }
 
-    const { error: insertError } = await supabase
+    const { data: product, error: insertError } = await supabase
         .from("products")
         .insert([
             {
@@ -719,7 +727,8 @@ export async function addProductInputHandler(ctx) {
                 price: productPrice,
             },
         ])
-        .select();
+        .select("*")
+        .single()
 
     if (insertError) {
         keyboard.text(
@@ -737,6 +746,14 @@ export async function addProductInputHandler(ctx) {
         );
         return;
     }
+
+    const { data } = await supabase.from("product_datas").insert([
+        { data: "1", product_id: product.id },
+        { data: "2", product_id: product.id },
+        { data: "3", product_id: product.id },
+        { data: "4", product_id: product.id },
+        { data: "5", product_id: product.id },
+    ]);
 
     ctx.session.step = undefined;
     keyboard.text(

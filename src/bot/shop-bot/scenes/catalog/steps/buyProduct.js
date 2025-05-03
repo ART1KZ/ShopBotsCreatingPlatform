@@ -36,6 +36,6 @@ export async function buyProductStep(ctx) {
     });
 
     await ctx.editMessageText("Покупка прошла успешно!", {
-        reply_markup: new InlineKeyboard().text("На главную", "main_menu")
-    })
+        reply_markup: new InlineKeyboard().text("На главную", "main_menu"),
+    });
 }

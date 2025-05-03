@@ -82,8 +82,6 @@ export async function addBotTokenInputHandler(ctx) {
             `🔗 Ссылка на бота: t.me/${shopBotUsername}`,
         {
             reply_markup: new InlineKeyboard()
-                .text("⚙️ Настройка магазина", `manage_shop_${newShop.id}`)
-                .row()
                 .text("🏠 В главное меню", "menu"),
         }
     );

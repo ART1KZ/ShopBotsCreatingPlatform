@@ -6,10 +6,23 @@ import {
     addBotTokenInputHandler,
 } from "./scenes/adding-shop/scene.js";
 import {
-    getShopsHandler,
-    manageShopHandler,
-} from "./scenes/selecting-shop/scene.js";
-import { toggleBotHandler } from "./scenes/editing-shop/scene.js";
+    manageAdminsHandler,
+    addAdminHandler,
+    addAdminInputHandler,
+    addAdminRightsHandler,
+    confirmAddAdminHandler,
+    editAdminHandler,
+    updateAdminRightsHandler,
+    confirmUpdateAdminHandler,
+    deleteAdminHandler,
+    confirmDeleteAdminHandler,
+} from "./scenes/selecting-shop/editing-admins/scene.js";
+import {
+    confirmDeleteShopHandler,
+    deleteShopHandler,
+} from "./scenes/selecting-shop/editing-shop/deleting-shop/scene.js";
+import { getShopsHandler, manageShopHandler } from "./scenes/selecting-shop/scene.js";
+import { toggleBotHandler } from "./scenes/selecting-shop/editing-shop/scene.js";
 import {
     addCategoryHandler,
     addSubcategoryHandler,
@@ -26,11 +39,15 @@ import {
     editProductHandler,
     editProductInputHandler,
     deleteProductHandler,
-} from "./scenes/editing-shop/managing-categories/scene.js";
+} from "./scenes/selecting-shop/editing-shop/managing-categories/scene.js";
 import {
     generateCategoryAcceptHandler,
     generateCategoryHandler,
-} from "./scenes/ai/category/scene.js";
+} from "./scenes/selecting-shop/ai/category/scene.js";
+import {
+    generateSubcategoryAcceptHandler,
+    generateSubcategoryHandler,
+} from "./scenes/selecting-shop/ai/subcategory/scene.js";
 
 export const bot = new Bot(process.env.BOT_TOKEN);
 
@@ -40,8 +57,9 @@ export const activeShopBotsHandlers = new Map();
 bot.use(
     session({
         initial: () => ({
-            step: undefined, // Текущий этап пользователя в боте
-            currentBotToken: undefined, // Последний введенный токен бота пользователем
+            step: undefined,
+            currentBotToken: undefined,
+            adminRights: undefined, // Для хранения прав администратора при добавлении
         }),
     })
 );
@@ -55,7 +73,6 @@ bot.on("callback_query:data", async (ctx) => {
         case callbackData === "menu":
             await menuHandler(ctx, true);
             break;
-
         case callbackData === "create_shop":
             await createShopHandler(ctx);
             break;
@@ -65,9 +82,41 @@ bot.on("callback_query:data", async (ctx) => {
         case callbackData.startsWith("manage_shop"):
             await manageShopHandler(ctx);
             break;
-
         case callbackData.startsWith("toggle_bot"):
             await toggleBotHandler(ctx);
+            break;
+        case callbackData.startsWith("delete_shop"):
+            await deleteShopHandler(ctx);
+            break;
+        case callbackData.startsWith("confirm_delete_shop"):
+            await confirmDeleteShopHandler(ctx);
+            break;
+        case callbackData.startsWith("manage_admins"):
+            await manageAdminsHandler(ctx);
+            break;
+        case callbackData.startsWith("add_admin_"):
+            await addAdminHandler(ctx);
+            break;
+        case callbackData.startsWith("add_admin_rights"):
+            await addAdminRightsHandler(ctx);
+            break;
+        case callbackData.startsWith("confirm_add_admin"):
+            await confirmAddAdminHandler(ctx);
+            break;
+        case callbackData.startsWith("edit_admin"):
+            await editAdminHandler(ctx);
+            break;
+        case callbackData.startsWith("update_admin_rights"):
+            await updateAdminRightsHandler(ctx);
+            break;
+        case callbackData.startsWith("confirm_update_admin"):
+            await confirmUpdateAdminHandler(ctx);
+            break;
+        case callbackData.startsWith("delete_admin"):
+            await deleteAdminHandler(ctx);
+            break;
+        case callbackData.startsWith("confirm_delete_admin"):
+            await confirmDeleteAdminHandler(ctx);
             break;
         case callbackData.startsWith("get_categories"):
             await getCategoriesHandler(ctx);
@@ -105,6 +154,12 @@ bot.on("callback_query:data", async (ctx) => {
         case callbackData.startsWith("generate_category"):
             await generateCategoryHandler(ctx);
             break;
+        case callbackData.startsWith("generate_subcategory_confirm"):
+            await generateSubcategoryAcceptHandler(ctx);
+            break;
+        case callbackData.startsWith("generate_subcategory"):
+            await generateSubcategoryHandler(ctx);
+            break;
     }
 
     await ctx.answerCallbackQuery();
@@ -129,6 +184,9 @@ bot.on("message", async (ctx) => {
             break;
         case ctx.session.step.startsWith("edit_product_input"):
             await editProductInputHandler(ctx);
+            break;
+        case ctx.session.step.startsWith("add_admin_input"):
+            await addAdminInputHandler(ctx);
             break;
         default:
             await sendDontUnderstandErrorMessage(ctx);

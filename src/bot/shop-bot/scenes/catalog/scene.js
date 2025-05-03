@@ -194,10 +194,10 @@ export async function search(ctx) {
                 messages: [
                     {
                         role: "user",
-                        content: JSON.stringify(items) + "\n\nprompt: " + ctx.message.text,
+                        content: JSON.stringify(items) + "\n\nprompt: " + ctx?.message?.text,
                     }
                 ],
-                agent_id: process.env.MISTRAL_AGENT_ID,
+                agent_id: process.env.SEARCH_AGENT_ID,
             })
         })
 

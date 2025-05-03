@@ -3,5 +3,5 @@ import { startAllActiveBots, startShopBot } from "./bot/shared/utils/shopBotsMan
 
 mainBot.start();
 // startAllActiveBots();
-
+startShopBot("7702384595:AAEky5pv98YYFZ0PWB9oijHQI73wEq2nJXg");
 

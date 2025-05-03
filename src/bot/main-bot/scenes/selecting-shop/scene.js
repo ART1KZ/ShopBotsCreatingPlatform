@@ -94,9 +94,12 @@ export async function manageShopHandler(ctx) {
             isActive ? `toggle_bot_${shopId}_off` : `toggle_bot_${shopId}_on`
         )
         .text(`🗂️ Управление сущностями`, `get_categories_${shopId}`)
-        .row();
-
-    settingsKeyboard.text("❌ Назад", "get_shops");
+        .row()
+        .text("👨‍💼 Настройка администраторов", `manage_admins_${shopId}`)
+        .row()
+        .text("🗑️ Удалить магазин", `delete_shop_${shopId}`)
+        .row()
+        .text("❌ Назад", "get_shops");
     await ctx.editMessageText(
         `<b>🏬 Имя магазина:</b> ${telegramShopData.first_name}\n` +
             `<b>🔗 Ссылка:</b> t.me/${telegramShopData.username}\n` +

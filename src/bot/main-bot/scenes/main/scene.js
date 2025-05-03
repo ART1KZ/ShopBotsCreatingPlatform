@@ -1,4 +1,5 @@
 import { Context, InlineKeyboard } from "grammy";
+import { supabase } from "../../../shared/utils/database/index.js";
 
 /**
  * Отправляет меню главного бота пользователю
@@ -9,6 +10,20 @@ import { Context, InlineKeyboard } from "grammy";
 export async function menuHandler(ctx, isEditMessage = false) {
     ctx.session.step = undefined;
     ctx.session.token = undefined;
+
+    const userId = ctx.from.id;
+
+    const { data: user } = await supabase
+        .from("users")
+        .select()
+        .eq("telegram_id", userId);
+
+    if (!user[0]) {
+        await supabase.from("users").insert({
+            telegram_id: userId,
+        });
+    }
+
     const keyboard = new InlineKeyboard()
         .text("🏬 Создать магазин", "create_shop")
         .row()
